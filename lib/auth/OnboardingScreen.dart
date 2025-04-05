@@ -19,13 +19,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "image": "images/heart.png",
     },
     {
-      "title": "Téléversez vos ECG",
+      "title": "Téléversez vos analyses",
       "subtitle": "Prenez une photo ou importez une image de votre analyses médicales.",
       "image": "images/upload.png",
     },
     {
-      "title": "Obtenez des résultats",
-      "subtitle": "Recevez une interprétation rapide de votre santé .",
+      "title": "Obtenez des prédictions",
+      "subtitle": "Recevez une interprétation rapide de votre résultats .",
       "image": "images/heartbeat.png",
     },
   ];
