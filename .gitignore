@@ -1,5 +1,8 @@
 android/app/google-services.json
+<<<<<<< HEAD
 
+=======
+>>>>>>> auth-feature
 # Miscellaneous
 *.class
 *.log

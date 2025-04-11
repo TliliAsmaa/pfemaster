@@ -1,0 +1,2 @@
+C:/Users/ALEM/AndroidStudioProjects/pfemaster/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/ALEM/AndroidStudioProjects/pfemaster/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/CMakeFiles/rebuild_cache.dir
