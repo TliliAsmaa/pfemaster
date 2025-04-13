@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import pickle  # Pour charger le modèle enregistré
 import numpy as np
 import joblib
+import os
 app = Flask(__name__)
  
 # Charger ton modèle depuis un fichier .pkl
