@@ -114,7 +114,7 @@ Future<void> sendToFlaskAPI(Map<String, dynamic> formData) async {
       print('Réponse de l\'API: ${response.body}');
       // Tu peux gérer la réponse ici, par exemple, afficher la prédiction à l'utilisateur
         setState(() {
-        // predictionResult = data['prediction'].toString();  
+         predictionResult = data['prediction'].toString();  
          isLoading = false;          // Récupère la prédiction de la réponse
       });
       int result = int.parse(predictionResult);
