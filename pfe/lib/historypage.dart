@@ -57,10 +57,11 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      backgroundColor:  Color(0xFFF7FBFF),
+    /*  appBar: AppBar(
         title: Text('Historique des Prédictions'),
         backgroundColor: Color(0xFF5C6BC0), // Couleur d'AppBar modernisée
-      ),
+      ),*/
       body: userId == null
           ? Center(child: Text("Utilisateur non connecté"))
           : StreamBuilder<QuerySnapshot>(
@@ -68,6 +69,9 @@ class _HistoryPageState extends State<HistoryPage> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text("Aucune prédiction trouvée.",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),));
                 }
 
                 final predictions = snapshot.data!.docs;

@@ -33,9 +33,11 @@ class _GooglesignupcompleteState extends State<Googlesignupcomplete> {
   
     CollectionReference users = FirebaseFirestore.instance.collection('users');
   // 🔁 Redirige vers la homepage
-  Navigator.of(context).pushNamedAndRemoveUntil("homepage", (route) => false);
-    
+ 
+    //Navigator.of(context).pop();
       // Call the user's CollectionReference to add a new user
+      String? googlePhotoUrl = FirebaseAuth.instance.currentUser?.photoURL;
+
       return users
            .doc(user.uid) // Utiliser l'UID de l'utilisateur pour le document
       .set({
@@ -45,9 +47,13 @@ class _GooglesignupcompleteState extends State<Googlesignupcomplete> {
         'birth date': _dateController.text,
         'gender': _selectedGender,
         'age': age,
+        'photoUrl': googlePhotoUrl,
         'createdAt': FieldValue.serverTimestamp(),
       })
-          .then((value) => print("User Added"))
+          .then((value) {
+            print("User Added");
+             Navigator.of(context).pushNamedAndRemoveUntil("AuthWrapper", (route) => false);
+   } )
           .catchError((error) => print("Failed to add user: $error"));
     
 

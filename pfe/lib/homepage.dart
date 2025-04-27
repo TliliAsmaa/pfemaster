@@ -224,16 +224,19 @@ class _HomePageState extends State<HomePage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    String fullName = userData!['full_name'] ?? 'Nom non disponible';
+    String fullName = userData!['full name'] ?? 'Nom non disponible';
     return Scaffold(
-      backgroundColor: Color(0xFFF9F9F9),
+       backgroundColor:  Color(0xFFF7FBFF),
+     // backgroundColor: Color(0xFFF9F9F9),
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: Colors.grey.shade100,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: CircleAvatar(
-            backgroundImage: AssetImage("assets/user.png"), // image de profil
+           backgroundImage: userData!['photoUrl'] != null
+        ? NetworkImage(userData!['photoUrl'])
+        : AssetImage("assets/user.png") as ImageProvider,
           ),
         ),
         title: Text.rich(
@@ -276,7 +279,7 @@ class _HomePageState extends State<HomePage> {
                 margin: EdgeInsets.only(left: 3, right: 3),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: Colors.grey.shade100,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),

@@ -10,6 +10,7 @@ import 'package:pfemaster/auth/signupp.dart';
 import 'package:pfemaster/bottomnavbar.dart';
 
 import 'package:pfemaster/homepage.dart';
+import 'package:pfemaster/modifieprofile.dart';
 
 import 'package:pfemaster/prediction%20pages/formPrediction.dart';
 import 'package:pfemaster/prediction%20pages/imagePrediction';
@@ -50,12 +51,14 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       
       
-      home:(FirebaseAuth.instance.currentUser != null && FirebaseAuth.instance.currentUser!.emailVerified) ?  Bottomnavbar() : OnboardingScreen(), // Remplace par ta page d'accueil
+     // home:(FirebaseAuth.instance.currentUser != null && FirebaseAuth.instance.currentUser!.emailVerified) ?  Bottomnavbar() : OnboardingScreen(), // Remplace par ta page d'accueil
       //SignUpSlider(), // Appel de la page de connexion
     
       // OnboardingScreen(), // Appel de la page HomePage
-
+      home: AuthWrapper(),
       routes: {
+        'AuthWrapper': (context) => AuthWrapper(), // Remplace par ta page d'accueil
+        'bottomnavbar': (context) => Bottomnavbar(), // Remplace par ta page d'accueil
         'imagePrediction' :(context)=> ImagePredictionPage(),
         'formPrediction' :(context) => Formprediction(),
         'googleSignupComplete': (context) => Googlesignupcomplete(), // Remplace par ta page de connexion
@@ -63,7 +66,36 @@ class _MyAppState extends State<MyApp> {
         'homepage': (context) => HomePage(), // Remplace par ta page d'accueil
         'Login': (context) => Login(), // Remplace par ta page de connexion
         'SignUp': (context) => SignUp(), // Remplace par ta page de connexion
+        'EditProfile': (context) => EditProfile(), // Remplace par ta page de connexion
       },
     );
   }
 }
+
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Pendant le chargement
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // Utilisateur connecté
+        if (snapshot.hasData) {
+           print('=======================here navbar!');
+          return Bottomnavbar();
+         
+        }
+
+        // Utilisateur non connecté
+        return OnboardingScreen();
+      },
+    );
+  }
+}
+

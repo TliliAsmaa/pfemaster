@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pfemaster/homepage.dart';
 import 'package:pfemaster/historypage.dart';
+import 'package:pfemaster/profilepage.dart';
 
 class Bottomnavbar extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class _bottomnavbarState extends State<Bottomnavbar> {
   final List<Widget> _pages = [
     HomePage(),
     HistoryPage(), // Tu peux remplacer par une vraie page plus tard
-    PlaceholderWidget(title: "Profil"),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -31,7 +32,7 @@ class _bottomnavbarState extends State<Bottomnavbar> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: Colors.grey.shade100,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Color(0xFF4A90E2),
@@ -50,22 +51,6 @@ class _bottomnavbarState extends State<Bottomnavbar> {
             label: 'Profil',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class PlaceholderWidget extends StatelessWidget {
-  final String title;
-
-  const PlaceholderWidget({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        "$title (à venir)",
-        style: TextStyle(fontSize: 22, color: Colors.grey),
       ),
     );
   }

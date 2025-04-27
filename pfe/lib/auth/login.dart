@@ -43,7 +43,7 @@ Future signInWithGoogle() async {
     if (userDoc.exists) {
       print('Document exists.');
       // L'utilisateur existe déjà, aller à la page d'accueil
-      Navigator.of(context).pushNamedAndRemoveUntil("homepage", (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil("AuthWrapper", (route) => false);
     } else {
       print("new inscription Google");
       // L'utilisateur est nouveau, rediriger vers la page pour compléter le profil
@@ -180,7 +180,7 @@ Future signInWithGoogle() async {
     
   });
   if(credential.user!.emailVerified){
-    Navigator.of(context).pushReplacementNamed('homepage');
+    Navigator.of(context).pushReplacementNamed('AuthWrapper');
     //ajouter un nouvel utilisateur dans la base de donnees
 
          

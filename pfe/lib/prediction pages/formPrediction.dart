@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pfemaster/component/logoauth.dart';
 import 'package:pfemaster/component/textformfield.dart';
 
 import 'dart:convert';
@@ -267,6 +268,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
+                    
                     Container(
                         child: Text(
                           "Fill in the form to get your prediction",
@@ -380,7 +382,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
               SizedBox(height: 15),
                // Champs booléens (Anaemia, Diabetes, etc.)
               SwitchListTile(
-                title: Text('Anaemia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                title: Text('Anaemia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: anaemia? Color(0xFF4A90E2) : Colors.black,)),
                 value: anaemia,
                 activeColor: Color(0xFF4A90E2),        // couleur du bouton switch (le cercle)
                 activeTrackColor: const Color.fromARGB(255, 153, 186, 215), // couleur de la piste quand activé
@@ -415,7 +417,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
               ),
               SizedBox(height: 10),
               SwitchListTile(
-                title: Text('Hypertension', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                title: Text('Hypertension', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: hypertension ? Color(0xFF4A90E2) : Colors.black,)),
                 value: hypertension,
                 activeColor: Color(0xFF4A90E2),        // couleur du bouton switch (le cercle)
                 activeTrackColor: const Color.fromARGB(255, 153, 186, 215), // couleur de la piste quand activé
@@ -429,7 +431,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
               ),
               SizedBox(height: 10),
               SwitchListTile(
-                title: Text('Smoking', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                title: Text('Smoking', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: smoking ? Color(0xFF4A90E2) : Colors.black,)),
                 value: smoking,
                 activeColor: Color(0xFF4A90E2),        // couleur du bouton switch (le cercle)
                 activeTrackColor: const Color.fromARGB(255, 153, 186, 215), // couleur de la piste quand activé
