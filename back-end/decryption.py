@@ -22,7 +22,7 @@ message = ocr_preprocess.getmessage(image_path)
 message = message.replace('\n', ' ')
 message = re.sub(r'\d{2}-\d{2}-\d{2,4}', '', message)
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+url =  f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={API_KEY}"
 headers = {"Content-Type": "application/json"}
 
 if message:
