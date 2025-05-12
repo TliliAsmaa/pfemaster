@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7baef88a-f9a6-4264-b314-57574e199e06" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/arm64-v8a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/arm64-v8a/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/resultats_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/resultats_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pfe/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

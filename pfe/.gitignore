@@ -1,4 +1,5 @@
 android/app/google-services.json
+back-end flask/.env
 # Miscellaneous
 *.class
 *.log
