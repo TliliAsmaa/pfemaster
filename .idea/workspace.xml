@@ -11,19 +11,6 @@
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/auth/login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/auth/login.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/auth/signupp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/auth/signupp.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/bottomnavbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/bottomnavbar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/component/textformfield.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/component/textformfield.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/historypage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/historypage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/homepage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/formPrediction.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/formPrediction.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/profilepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/profilepage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

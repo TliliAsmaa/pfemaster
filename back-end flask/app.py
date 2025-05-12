@@ -4,9 +4,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import numpy as np
-import cv2
-import pytesseract
-import tempfile
+#import cv2
+#import pytesseract
+#import tempfile
 import os
 app = Flask(__name__)
 CORS(app)
