@@ -1,13 +1,18 @@
+from extract import preprocess_image
+
 from flask import Flask, request, jsonify
-import pickle  # Pour charger le modèle enregistré
-import numpy as np
+from flask_cors import CORS
 import joblib
+import numpy as np
+import cv2
+import pytesseract
+import tempfile
 import os
 app = Flask(__name__)
- 
+CORS(app)
 # Charger ton modèle depuis un fichier .pkl
-model = joblib.load('modele_heart_failure.pkl') # Remplace par le chemin de ton modèle
-pca = joblib.load('pca_model.pkl')  # Modèle PCA
+model = joblib.load('modele_heart_failure.pkl2') # Remplace par le chemin de ton modèle
+pca = joblib.load('pca_model.pkl2')  # Modèle PCA
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -49,7 +54,42 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Render fournit un PORT
-    app.run(host='0.0.0.0', port=port)
+#if __name__ == '__main__':
+    #port = int(os.environ.get('PORT', 5000))  # Render fournit un PORT
+    #app.run(debug=True,host='0.0.0.0', port=port)
     #app.run(debug=True)
+
+
+
+@app.route('/analyse', methods=['POST'])
+def analyse():
+    if 'image' not in request.files:
+        return jsonify({'error': 'Aucune image envoyée'}), 400
+
+    image = request.files['image']
+    gender = request.form.get('gender')
+    age = request.form.get('age')
+
+    save_path = os.path.join('uploads', image.filename)
+    os.makedirs('uploads', exist_ok=True)
+    image.save(save_path)
+
+    # Appeler ton script Python (decryption.py)
+    result = subprocess.run(
+        ['python', 'decryption.py', save_path, gender, age],
+        capture_output=True, text=True
+    )
+
+    if result.returncode != 0:
+        return jsonify({'error': 'Erreur script Python', 'details': result.stderr}), 500
+
+    try:
+        json_output = result.stdout
+        return json_output
+    except Exception as e:
+        return jsonify({'error': 'Erreur parsing JSON', 'details': str(e)}), 500
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
