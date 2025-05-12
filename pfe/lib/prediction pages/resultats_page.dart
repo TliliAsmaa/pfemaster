@@ -79,7 +79,7 @@ class ResultatsPage extends StatelessWidget {
   ) async {
     try {
       Uri apiUrl = Uri.parse(
-        'http://192.168.7.247:5000/predict',
+        'http:// 192.168.1.39:5000/predict',
       ); // Remplace par ton URL Flask si nécessaire
 
       final response = await http.post(

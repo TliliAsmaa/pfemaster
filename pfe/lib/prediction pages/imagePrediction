@@ -87,13 +87,13 @@ setState(() {
   }
 }*/
 
- Future<void> _analyserImage() async {
+ Future<void> _analyserImage(File imageFile) async {
     if (_image == null) return;
     setState(() {
       _isLoading = true;
     });
 
-    final uri = Uri.parse('http://192.168.7.247:5000/analyse');
+    final uri = Uri.parse('http:// 192.168.1.39:5000/analyse');
     var request =
         http.MultipartRequest('POST', uri)
           ..fields['gender'] = 'homme'
@@ -268,7 +268,7 @@ setState(() {
         : ElevatedButton(
            onPressed: () async {
   if (_image != null) {
-    await _analyserImage();
+    await _analyserImage(_image! );
   }
 },
 

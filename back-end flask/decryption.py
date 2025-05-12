@@ -7,8 +7,8 @@ import ocr_preprocess
 from dotenv import load_dotenv
 
 load_dotenv()
-#API_KEY = "AIzaSyAAFm6SGgZpniwCJ-_LWSZtElaYeLxLjHU"  # assure-toi que .env contient GEMINI_API_KEY=ta_clé
-API_KEY ="AIzaSyCS3medoSlJAgp9GjGWUZxgiQPW89HdNO4"
+API_KEY = "AIzaSyAAFm6SGgZpniwCJ-_LWSZtElaYeLxLjHU"  # assure-toi que .env contient GEMINI_API_KEY=ta_clé
+
 if len(sys.argv) != 4:
     sys.exit(1)
 
