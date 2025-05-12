@@ -33,20 +33,24 @@ class CustomTextFormField extends StatelessWidget {
 }*/
 
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 class CustomTextFormField extends StatefulWidget {
+  final List<TextInputFormatter>? inputFormatters;
   final String hinttext;
   final TextEditingController mycontroller;
   final String? Function(String?)? validator;
   final bool isPassword;
+  final TextStyle? hintStyle;
    final TextInputType keyboardType; 
   const CustomTextFormField({
     super.key,
     required this.hinttext,
     required this.mycontroller,
     this.validator,
+    this.hintStyle,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
+    this.inputFormatters,
   });
 
   @override
@@ -68,12 +72,15 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      
+
+      inputFormatters: widget.inputFormatters,
        keyboardType: widget.keyboardType,
       validator: widget.validator,
       controller: widget.mycontroller,
       obscureText: obscureText,
       decoration: InputDecoration(
-        hintStyle: const TextStyle(fontSize: 16, color: Colors.grey),
+       hintStyle: widget.hintStyle ?? const TextStyle(fontSize: 14,  color: Colors.blueGrey,),
         hintText: widget.hinttext,
         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         filled: true,

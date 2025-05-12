@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:pfemaster/modifieprofile.dart';
+import 'edit_field_page.dart'; // <-- on crée cette page juste après
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -24,8 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchUserData() async {
     if (user != null) {
-      DocumentSnapshot doc =
-          await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
 
       if (doc.exists) {
         setState(() {
@@ -44,14 +43,30 @@ class _ProfilePageState extends State<ProfilePage> {
         profileImageUrl = url;
       });
     } catch (e) {
-      // Pas de photo
       print("Pas de photo trouvée");
     }
   }
 
   void logout() async {
     await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacementNamed(context, 'login'); // Ajuste la route selon ton projet
+    Navigator.pushReplacementNamed(context, 'login');
+  }
+
+  void navigateToEdit(String field, String currentValue) async {
+    final newValue = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditFieldPage(field: field, currentValue: currentValue),
+      ),
+    );
+
+    if (newValue != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+        field: newValue,
+        if (field == 'birth date') 'age': DateTime.now().year - DateTime.parse(newValue).year
+      });
+      fetchUserData(); // refresh UI
+    }
   }
 
   @override
@@ -83,24 +98,40 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(userData!['email'] ?? '', style: TextStyle(color: Colors.grey[600])),
 
                   const SizedBox(height: 24),
-                  _buildInfoRow("Âge", userData!['age'].toString()),
-                  _buildInfoRow("Genre", userData!['gender']),
-                  _buildInfoRow("Date de naissance", userData!['birth date']),
-
+                  _buildEditableRow("Nom complet", "full name", userData!['full name']),
+                  _buildEditableRow("Email", "email", userData!['email']),
+                  _buildInfoRow("Âge", userData!['age'].toString()), // Non modifiable
+                  _buildEditableRow("Genre", "gender", userData!['gender']),
+                  _buildEditableRow("Date de naissance", "birth date", userData!['birth date']),
+                
                   const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => EditProfile()),
+                  TextButton.icon(
+ onPressed: () async {
+  bool? confirm = await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("Réinitialiser le mot de passe"),
+      content: Text("Un email de réinitialisation sera envoyé à ${user?.email}. Continuer ?"),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Annuler")),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Envoyer")),
+      ],
+    ),
   );
-                    },
-                    icon: Icon(Icons.edit),
-                    label: Text("Modifier" ,style: TextStyle(color:Colors.white),),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
-                  ),
 
-                  const SizedBox(height: 16),
+  if (confirm == true && user?.email != null) {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: user!.email!);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Email de réinitialisation envoyé.")),
+    );
+  }
+},
+
+  icon: Icon(Icons.lock_reset),
+  label: Text("Changer le mot de passe"),
+  style: TextButton.styleFrom(foregroundColor: Colors.black),
+),
+
                   TextButton.icon(
                     onPressed: logout,
                     icon: Icon(Icons.logout),
@@ -113,9 +144,31 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildEditableRow(String label, String field, String value) {
+    return InkWell(
+      onTap: () => navigateToEdit(field, value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("$label :", style: TextStyle(fontWeight: FontWeight.w600)),
+            Row(
+              children: [
+                Text(value, style: TextStyle(color: Colors.grey[700])),
+                const SizedBox(width: 8),
+                Icon(Icons.edit, size: 18, color: Colors.grey),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoRow(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

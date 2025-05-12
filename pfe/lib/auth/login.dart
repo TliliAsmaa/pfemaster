@@ -84,33 +84,33 @@ Future signInWithGoogle() async {
                 Container(height:80,),
                 LogoAuth(),
                 Container(height:20),
-                  Text("Login",style:TextStyle(fontSize: 30,fontWeight: FontWeight.bold)),
+                  Text("Se connecter",style:TextStyle(fontSize: 30,fontWeight: FontWeight.bold)),
                    Container(height:10),
-                  Text("Login to continue using the app",style:TextStyle(color: Colors.grey)),
+                  Text("Connecte toi pour continuer à utiliser l'application",style:TextStyle(color: Colors.grey)),
                    Container(height:20),
                    Text("Email",style:TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
                     Container(height:10),
                     CustomTextFormField(
-                    hinttext: "Enter your email",
+                    hinttext: "Saisir votre adresse email",
                     mycontroller: email,
                     validator: (val) {
                       if(val==""){
-                        return "Please enter your email";
+                        return "veuiller saisir votre adresse email";
                       }
                      return null;
                     }
                     ),
                     Container(height:10),
-                   Text("Password",style:TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+                   Text("Mot de passe",style:TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
                    Container(height:10),
                    CustomTextFormField(
                     
-                    hinttext: "Enter your password",
+                    hinttext: "Saisir votre mot de passe",
                    isPassword: true,
                     mycontroller: password,
                      validator: (val) {
                       if(val==""){
-                        return "Please enter your password";
+                        return "veuiller saisir votre mot de passe";
                       }
                      return null;
                     }
@@ -118,7 +118,7 @@ Future signInWithGoogle() async {
                    InkWell(
                     onTap: () async{
                       if(email.text.isEmpty){
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter your email")));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Veuillez saisir votre adresse email")));
                       }else{
                         
                           try {
@@ -128,13 +128,13 @@ Future signInWithGoogle() async {
                         dialogType: DialogType.success,
                         animType: AnimType.rightSlide,
                         title: 'Info',
-                        desc: 'Please check your email for password reset link',
+                        desc: 'Veuillez vérifier votre adresse email pour réinitialiser votre mot de passe',
                         btnOkOnPress: () async {
-                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Password reset email sent")));}).show();
+                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("E-mail de réinitialisation du mot de passe envoyé")));}).show();
                              } on Exception catch (e) {
                                 print('Error sending password reset email: $e');
                                 
-                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("no user found for that email"),duration: const Duration(milliseconds: 800),));
+                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Utilisateur n'existe pas"),duration: const Duration(milliseconds: 800),));
                                  }
                         
                    
@@ -144,7 +144,7 @@ Future signInWithGoogle() async {
                      child: Container(
                       margin:EdgeInsets.only(top:10,bottom:20),
                       alignment: Alignment.topRight,
-                       child: Text("Forgot Password?",
+                       child: Text("Mot de passe oublié?",
                        textAlign: TextAlign.right,
                        style:TextStyle(color: Colors.black,fontSize: 14,)),
                      ),
@@ -158,7 +158,7 @@ Future signInWithGoogle() async {
             height:50,
                   textColor: Colors.white,
                   color: const Color.fromRGBO(68, 138, 255, 1),
-                  child: Text("Login",style:TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
+                  child: Text("Se connecter",style:TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
                   shape: RoundedRectangleBorder(
                    
                       borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -167,18 +167,20 @@ Future signInWithGoogle() async {
                   onPressed: () async {
                     if(formkey.currentState!.validate()){
                             try {
-                               isloading =true;
-                                setState(() {
-                                 // isloading = true;
-                                });
+                               //isloading =true;
+                                /*setState(() {
+                                  isloading = true;
+                                });*/
   final credential =await FirebaseAuth.instance.signInWithEmailAndPassword(
+    
     email: email.text,
     password: password.text,
   );
-  isloading=false;
+  //isloading=false;
   setState(() {
-    
+    isloading=false;
   });
+  await Future.delayed(Duration(milliseconds: 500)); 
   if(credential.user!.emailVerified){
     Navigator.of(context).pushReplacementNamed('AuthWrapper');
     //ajouter un nouvel utilisateur dans la base de donnees
@@ -195,7 +197,13 @@ Future signInWithGoogle() async {
       ).show();
     }
 }  on FirebaseAuthException catch (e) {
+
+  
+      
   if (e.code == 'user-not-found') {
+     setState (() {
+                         isloading = false;
+                    });
     print('=====================================================user not found.');
    /* AwesomeDialog(
             context: context,
@@ -206,10 +214,13 @@ Future signInWithGoogle() async {
            
             ).show();*/
              ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("user not found")),
+                          SnackBar(content: Text("utilisateur non trouvé")),
                         );
   }
   else if (e.code == 'wrong-password') {
+    setState(() {
+                         isloading = false;
+                    });
     print('=====================================================wrong password.');
    /* AwesomeDialog(
             context: context,
@@ -221,14 +232,15 @@ Future signInWithGoogle() async {
             ).show();
             */
              ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("wrong password")),
-                        );}
+                          SnackBar(content: Text("Mot de passe incorect")),
+                        );
+                       } 
   }
   }
                     },
                   ),
                 Container(height:20),
-                Text("Or Login with",textAlign: TextAlign.center,),
+                Text("Ou connecter avec",textAlign: TextAlign.center,),
             Column(
               children: [
                 MaterialButton(onPressed:(){
@@ -256,11 +268,11 @@ Future signInWithGoogle() async {
                  
                    children:[
                     TextSpan(
-                      text: "Don't have an account? ",
+                      text: "vous n'avez pas de compte? ",
                       style: TextStyle(color: Colors.black,fontSize: 15),
                     ),
                     TextSpan(
-                      text: "Sign Up",
+                      text: "s'inscrire",
                       style: TextStyle(color: Colors.blueAccent,fontSize: 15,fontWeight: FontWeight.bold),
                      
                     )

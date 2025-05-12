@@ -186,6 +186,11 @@ class _HomePageState extends State<HomePage> {
 
  
 
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -196,14 +201,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   DocumentSnapshot? userData;
+  String? photoUrl;
+
+  int totalPredictions = 0;
+  int highRiskCount = 0;
+  int lowRiskCount = 0;
 
   @override
   void initState() {
     super.initState();
     fetchUserData();
+    _loadUserPhoto();
+    fetchPredictionStats();
   }
 
-  //pour afficher les données de l'utilisateur
   Future<void> fetchUserData() async {
     if (user != null) {
       DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -217,6 +228,46 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _loadUserPhoto() async {
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          photoUrl = doc.data()!['photoUrl'];
+        });
+      }
+    }
+  }
+
+  Future<void> fetchPredictionStats() async {
+    if (user != null) {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('predictions')
+        .get();
+
+      int total = snapshot.docs.length;
+      int high = 0;
+      int low = 0;
+
+      for (var doc in snapshot.docs) {
+        String result = doc['result'].toString();
+        if (result == 'Risque élevé' ) {
+          high++;
+        } else {
+          low++;
+        }
+      }
+
+      setState(() {
+        totalPredictions = total;
+        highRiskCount = high;
+        lowRiskCount = low;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (userData == null) {
@@ -224,19 +275,20 @@ class _HomePageState extends State<HomePage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     String fullName = userData!['full name'] ?? 'Nom non disponible';
+
     return Scaffold(
-       backgroundColor:  Color(0xFFF7FBFF),
-     // backgroundColor: Color(0xFFF9F9F9),
+      backgroundColor: Color(0xFFF7FBFF),
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: CircleAvatar(
-           backgroundImage: userData!['photoUrl'] != null
-        ? NetworkImage(userData!['photoUrl'])
-        : AssetImage("assets/user.png") as ImageProvider,
+            backgroundImage: photoUrl != null
+                ? NetworkImage(photoUrl!)
+                : AssetImage("images/upload.png") as ImageProvider,
           ),
         ),
         title: Text.rich(
@@ -272,11 +324,11 @@ class _HomePageState extends State<HomePage> {
       body: ListView(
         children: [
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Alignement à gauche
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 height: 300,
-                margin: EdgeInsets.only(left: 3, right: 3),
+                margin: EdgeInsets.symmetric(horizontal: 3),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
@@ -286,14 +338,16 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Alignement à gauche pour le texte
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "How Are You\nFeeling Today?",
+                      "Comment allez-vous \naujourd’hui ?",
                       style: TextStyle(
-                        fontSize: 32,
+                        fontStyle: FontStyle.italic,
+                        fontFamily: 'Roboto',
+                        fontSize: 30,
                         fontWeight: FontWeight.w300,
-                        color: Colors.black,
+                        color: Color.fromARGB(255, 23, 23, 23),
                         height: 1.8,
                       ),
                     ),
@@ -302,18 +356,14 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton.icon(
-                          
                           onPressed: () {
                             Navigator.pushNamed(context, "formPrediction");
                           },
-                          
                           label: Text("predict", style: TextStyle(color: Colors.white, fontSize: 16)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF4A90E2),
-                             minimumSize: Size(150, 50),
-                            //backgroundColor: Color.fromARGB(255, 181, 195, 219),
+                            minimumSize: Size(150, 50),
                             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                            
                             shape: StadiumBorder(),
                           ),
                         ),
@@ -321,11 +371,10 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             Navigator.pushNamed(context, 'imagePrediction');
                           },
-                          label: Text("caméra",style: TextStyle(fontSize: 16,color:Color(0xFF4A90E2)),),
+                          label: Text("caméra", style: TextStyle(fontSize: 16, color: Color(0xFF4A90E2))),
                           style: ElevatedButton.styleFrom(
-                             minimumSize: Size(150, 50),
-                             backgroundColor:  Colors.white,
-                            //backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                            minimumSize: Size(150, 50),
+                            backgroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                             shape: StadiumBorder(),
                           ),
@@ -339,10 +388,86 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 20),
             ],
           ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 25),
+
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text("📈 Vos statistiques",
+                
+                 textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, 
+                 
+                  )),
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildStatCard("Prédictions", totalPredictions.toString()),
+                  _buildStatCard("Risque élevé", highRiskCount.toString()),
+                  _buildStatCard("Risque faible", lowRiskCount.toString()),
+                ],
+              ),
+              SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text("🧠 Conseils Santé",
+                 style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                   color: Color(0xFF2B2B2B),
+                   fontSize: 16,)),
+              ),
+              SizedBox(height: 10),
+              Card(
+                
+                margin: EdgeInsets.symmetric(horizontal: 15),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Color(0xFFD0F4DE),
+                child: ListTile(
+                  leading: Icon(Icons.local_hospital, color: Colors.teal),
+                  title: Text("Faites au moins 30 min d'activité par jour."),
+                ),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: Text(
+                  "\"Un cœur en bonne santé, c’est un esprit apaisé.\" ❤️",
+                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey[700]),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
-  }}
+  }
+
+  Widget _buildStatCard(String title, String count) {
+    return Container(
+      width: 110,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      ),
+      child: Column(
+        children: [
+          Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 4),
+          Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+        ],
+      ),
+    );
+  }
+}
+
 
   /*
             // 🟢 Dernière prédiction
@@ -417,7 +542,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }*
+  
 
   Widget _buildStatCard(String title, String count) {
     return Container(

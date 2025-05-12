@@ -32,10 +32,12 @@ class _bottomnavbarState extends State<Bottomnavbar> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey.shade100,
+        //backgroundColor: Colors.grey.shade100,
+        backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Color(0xFF4A90E2),
+        //selectedItemColor: Color(0xFF4A90E2),
+        selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
@@ -47,7 +49,7 @@ class _bottomnavbarState extends State<Bottomnavbar> {
             label: 'Historique',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
             label: 'Profil',
           ),
         ],

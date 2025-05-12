@@ -15,6 +15,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
+    print("User ID: $userId");
     // On récupère l'ID de l'utilisateur connecté, ici on suppose qu'il est déjà authentifié
     userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
@@ -28,25 +29,69 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   // Fonction pour afficher les détails d'une prédiction
-  void _showDetails(BuildContext context, String details) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Détails de la Prédiction"),
-          content: Text(details),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Fermer'),
+  void _showDetails(BuildContext context, Map<String, dynamic> predictionData) {
+  String details = '''
+Âge : ${predictionData['age']}
+Sexe : ${predictionData['sex']== 1 ? 'Homme' : 'Femme'}
+Anémie : ${predictionData['anaemia'] == 1 ? 'Oui' : 'Non'}
+Diabète : ${predictionData['diabetes'] == 1 ? 'Oui' : 'Non'}
+Hypertension : ${predictionData['high_blood_pressure'] == 1 ? 'Oui' : 'Non'}
+Fumeur : ${predictionData['smoking'] == 1 ? 'Oui' : 'Non'}
+Créatinine phosphokinase : ${predictionData['creatinine_phosphokinase']}
+Fraction d’éjection : ${predictionData['ejection_fraction']}%
+Plaquettes : ${predictionData['platelets']}
+Créatinine sérique : ${predictionData['serum_creatinine']}
+Sodium sérique : ${predictionData['serum_sodium']}
+Durée de suivi (jours) : ${predictionData['time']}
+''';
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        
+        title: Container(
+          child: Column(
+            children: [
+              Text("Détails de la Prédiction" ,
+               style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                  letterSpacing: 1.2 // Couleur de texte modernisée
+                
+               ),),
+              Divider(
+                            color: Colors.grey, // Ligne de séparation supplémentaire
+                            thickness: 1.8,
+                          ),
+            ],
+          ),
+           
+          ),
+       
+        content: SingleChildScrollView(
+          child: Text(details, style: TextStyle(fontSize: 16)),
+        ),
+        actions: [
+          TextButton(
+            
+            style: TextButton.styleFrom(
+              
+              backgroundColor: Color(0xFFF7FBFF),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: Color(0xFFF7FBFF), width: 1),
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ],
-        );
-      },
-    );
-  }
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Fermer',style: TextStyle(color: Color(0xFF4A90E2),fontSize: 16),),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   // Fonction pour formater la date
   String _formatDate(Timestamp timestamp) {
@@ -58,10 +103,10 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:  Color(0xFFF7FBFF),
-    /*  appBar: AppBar(
-        title: Text('Historique des Prédictions'),
-        backgroundColor: Color(0xFF5C6BC0), // Couleur d'AppBar modernisée
-      ),*/
+      appBar: AppBar(
+      backgroundColor:  Color(0xFFF7FBFF),
+        // Couleur d'AppBar modernisée
+      ),
       body: userId == null
           ? Center(child: Text("Utilisateur non connecté"))
           : StreamBuilder<QuerySnapshot>(
@@ -75,8 +120,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 }
 
                 final predictions = snapshot.data!.docs;
-
+                
                 return ListView.builder(
+                  
                   padding: EdgeInsets.all(16),
                   itemCount: predictions.length,
                   itemBuilder: (context, index) {
@@ -103,6 +149,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     }
 
                     return Card(
+                      color: Colors.white,
                       margin: EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -111,7 +158,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       child: Column(
                         children: [
                           ListTile(
-                           
+                            
                             contentPadding: EdgeInsets.all(16),
                             title: Text(
                               "prédiction $index",
@@ -133,7 +180,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             ),
                             onTap: () {
                               // Afficher les détails de la prédiction ici
-                              _showDetails(context, "Détails supplémentaires à venir...");
+                              _showDetails(context, prediction.data() as Map<String, dynamic>);
                             },
                           ),
                           Divider(

@@ -1,8 +1,17 @@
+ext {
+    firebaseMessagingVersion = "15.2.5"
+    firebaseIidVersion = "21.1.0"
+}
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
+    configurations.all {
+    resolutionStrategy {
+        force 'com.google.firebase:firebase-iid:21.1.0'
+    }
+}
 }
 
 rootProject.buildDir = "../build"
@@ -25,5 +34,6 @@ buildscript {
     // ... other dependencies
     classpath 'com.google.gms:google-services:4.4.2'
       classpath 'com.android.tools.build:gradle:8.1.1' // Update this line
+       
   }
 }
