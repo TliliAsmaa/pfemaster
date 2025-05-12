@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: flask-api
-    runtime: python
-    buildCommand: ""
-    startCommand: "gunicorn app:app"
-    env: python
-    region: frankfurt
-    plan: free

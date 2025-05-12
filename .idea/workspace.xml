@@ -5,6 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7baef88a-f9a6-4264-b314-57574e199e06" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/back-end-flask/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/ProcFile.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/app.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/decryption.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/modele_heart_failure.joblib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/modele_heart_failure.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/modele_heart_failure.pkl2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/ocr_preprocess.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/pca_model.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/pca_model.pkl2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/render.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end-flask/requirements.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
