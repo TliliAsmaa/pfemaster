@@ -446,7 +446,7 @@ class _HomePageState extends State<HomePage> {
                 color: Color(0xFFD0F4DE),
                 child: ListTile(
                   leading: Icon(Icons.local_hospital, color: Colors.teal),
-                  title: Text("Faites au moins 30 min d'activité par jour."),
+                  title: Text(currentHealthTip),
                 ),
               ),
               SizedBox(height: 20),
