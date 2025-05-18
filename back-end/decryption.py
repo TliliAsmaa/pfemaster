@@ -2,31 +2,42 @@ import os
 import sys
 import re
 import json
-import requests
 import ocr_preprocess
+import google.generativeai as genai
 from dotenv import load_dotenv
 
-
-
 load_dotenv()
-api_key = os.getenv("API_KEY")  # assure-toi que .env contient GEMINI_API_KEY=ta_clé
 
-if len(sys.argv) != 4:
+# Configurer la clé API Gemini
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY")) # Remplace par ta vraie clé API
+
+model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
+
+
+
+
+
+
+
+
+if len(sys.argv) != 5:
+    print("Usage : python script.py <image_path> <gender> <age> <smoking>")
     sys.exit(1)
 
 image_path = sys.argv[1]
 gender = sys.argv[2]
 age = sys.argv[3]
+smoking = sys.argv[4]
+
 
 message = ocr_preprocess.getmessage(image_path)
 message = message.replace('\n', ' ')
 message = re.sub(r'\d{2}-\d{2}-\d{2,4}', '', message)
 
-url =  f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={API_KEY}"
-headers = {"Content-Type": "application/json"}
-
 if message:
     sex_num = 1 if gender.lower() in ['homme', 'male', 'masculin'] else 0
+    smoking_num = 1 if smoking.lower() in ['oui', 'yes', 'true', 'smoker'] else 0
 
     prompt = f"""
 Tu es un assistant médical expert.
@@ -41,17 +52,24 @@ Voici le texte brut :
 
 
 Informations supplémentaires :
-- Le sexe du patient est déjà connu : - Sexe: {'Homme' if sex_num == 1 else 'Femme'}
+- Le sexe du patient est déjà connu : - Sexe: {sex_num}
 - L'âge du patient est déjà connu : - Âge: {age} ans.
+- Fumeur: {smoking_num}.
 Ta mission :
 
 1. Ignore tout le texte qui n’est pas une analyse médicale (exemple : nom du labo, informations patient, date, etc.).
 2. Associe chaque nom d’analyse à sa valeur correspondante même si le format est perturbé.
 3. Pour chaque test médical identifié :
-   - Indique son identifiant (nom du test), sa valeur et son unité.
-   - Interprète le résultat selon les normes médicales standards en indiquant si c’est : 'bad', 'normal' ou 'illogical'.
-  - Structure chaque test sur une ligne au format JSON suivant :
-  {{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "interpretation": "bad"}}
+   - Indique pour chaque test :
+   - son identifiant (nom du test),
+   - sa valeur,
+   - son unité,
+   - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL"),
+   - une interprétation : 'bad', 'normal' ou 'illogical'.
+
+- Structure chaque test sur une ligne au format JSON suivant :
+{{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "reference": "plage_attendue", "interpretation": "bad"}}
+
 
 4. Analyse uniquement les résultats pertinents pour remplir les colonnes suivantes (comme dans un fichier CSV médical) :
 
@@ -87,60 +105,45 @@ Règles de remplissage :
 
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
-- Si une colonne reste vide (`null`) après avoir appliqué les règles ci-dessus, propose une valeur probable en te basant sur les autres résultats extraits et les tendances médicales habituelles. Sinon laisse `null`.
+Si une valeur ne peut pas être extraite du texte OCR, utilise les statistiques suivants à la place pour remplir les champs du tableau "data".
+Ne laisse **aucun champ vide** dans "data" (non Null)
+Voici les statistiques moyennes du dataset pour remplir les champs manquants :
+- creatinine_phosphokinase : moyenne = 581.84, écart-type = 970.29, min = 23.0, max = 7861.0, médiane = 250.0
+- ejection_fraction : moyenne = 38.08, écart-type = 11.83, min = 14.0, max = 80.0, médiane = 38.0
+- platelets : moyenne = 263358.03, écart-type = 97804.24, min = 25100.0, max = 850000.0, médiane = 262000.0
+- serum_creatinine : moyenne = 1.39, écart-type = 1.03, min = 0.5, max = 9.4, médiane = 1.1
+- serum_sodium : moyenne = 136.63, écart-type = 4.41, min = 113.0, max = 148.0, médiane = 137.0
 
 Retourne un objet JSON strictement valide avec deux sections : "results" et "data". Ne mets aucun commentaire (pas de // ou /* ... */). Le JSON doit être parfaitement décodable sans aucune explication dans les valeurs. Toute explication doit être faite hors du JSON si nécessaire.
 
 1. **results** : Liste des tests avec leurs identifiants, valeurs, unités et interprétations sous forme d'objets JSON.
 2. **data** : Un objet contenant les résultats agrégés pour remplir les colonnes du fichier CSV, y compris les champs comme `"anaemia"`, `"creatinine_phosphokinase"`, `"diabetes"`, `"platelets"`, etc., avec les valeurs interprétées.
-
 """
 
-    data = {
-        "contents": [
-            {
-                "parts": [{"text": prompt}]
-            }
-        ]
-    }
-
     try:
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        result = response.json()
+        response = model.generate_content(prompt)
+        reply = response.text.strip()
 
-        if ('candidates' in result and
-            len(result['candidates']) > 0 and
-            'content' in result['candidates'][0] and
-            'parts' in result['candidates'][0]['content'] and
-            len(result['candidates'][0]['content']['parts']) > 0 and
-            'text' in result['candidates'][0]['content']['parts'][0]):
+        # Nettoyer automatiquement les balises Markdown inutiles
+        if reply.startswith('```json'):
+            reply = reply.replace('```json', '').strip()
+        elif reply.startswith("'''json"):
+            reply = reply.replace("'''json", '').strip()
+        if reply.endswith('```') or reply.endswith("'''"):
+            reply = reply[:-3].strip()
 
-            reply = result['candidates'][0]['content']['parts'][0]['text']
+        try:
+            json_data = json.loads(reply)
 
-            # Nettoyer automatiquement les balises Markdown inutiles
-            reply_clean = reply.strip()
-            if reply_clean.startswith('```json'):
-                reply_clean = reply_clean.replace('```json', '').strip()
-            if reply_clean.startswith('```'):
-                reply_clean = reply_clean.replace('```', '').strip()
-            if reply_clean.startswith("'''json"):
-                reply_clean = reply_clean.replace("'''json", '').strip()
-            if reply_clean.startswith("'''"):
-                reply_clean = reply_clean.replace("'''", '').strip()
-            if reply_clean.endswith('```'):
-                reply_clean = reply_clean[:-3].strip()
-            if reply_clean.endswith("'''"):
-                reply_clean = reply_clean[:-3].strip()
+            # ➕ Remplissage automatique des champs manquants avec moyennes
+            #if "data" in json_data:
+            #    json_data["data"] = remplir_champs_vides_par_moyenne(json_data["data"])
 
-            try:
-                json_data = json.loads(reply_clean)
-                print(json.dumps(json_data, indent=2, ensure_ascii=False))
-            except json.JSONDecodeError:
-                print(reply_clean)
+            print(json.dumps(json_data, indent=2, ensure_ascii=False))
 
-        else:
-            print("Réponse inattendue :", result)
+        except json.JSONDecodeError:
+            print("Réponse reçue mais le JSON n'est pas valide :\n")
+            print(reply)
 
-    except requests.exceptions.RequestException as e:
-        print(f"Erreur requête Gemini : {e}")
+    except Exception as e:
+        print(f"Erreur lors de l'appel à Gemini : {e}")
