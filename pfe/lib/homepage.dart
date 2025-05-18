@@ -213,6 +213,8 @@ class _HomePageState extends State<HomePage> {
     fetchUserData();
     _loadUserPhoto();
     fetchPredictionStats();
+    // Choisir un conseil santé aléatoire à chaque ouverture
+    currentHealthTip = healthTips[Random().nextInt(healthTips.length)];
   }
 
   Future<void> fetchUserData() async {
@@ -268,6 +270,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /*-----------------------------*/
+  String currentHealthTip = "";
+
+  List<String> healthTips = [
+    "Faites au moins 30 min d'activité par jour.",
+    "Buvez au moins 1,5 litre d'eau chaque jour.",
+    "Privilégiez une alimentation riche en fibres.",
+    "Dormez entre 7 et 8 heures par nuit.",
+    "Réduisez votre consommation de sel et de sucre.",
+    "Pratiquez la méditation pour réduire le stress.",
+    "Faites des pauses régulières si vous travaillez assis.",
+    "Faites un bilan de santé annuel.",
+  ];
+  
   @override
   Widget build(BuildContext context) {
     if (userData == null) {
