@@ -1,12 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'analyse_resultat.dart';
 import 'resultats_page.dart';
 import 'prediction_data.dart';
-import 'dart:convert';
+
 class ImagePredictionPage extends StatefulWidget {
   const ImagePredictionPage({super.key});
 
@@ -18,9 +23,63 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
   File? _image;
   bool _isLoading = false;
 
+  /*------------------------- */
+  String _resultat = '';
+  int? _age;
+  String? _gender;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserInfo();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    try {
+      // Récupère l'utilisateur connecté
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Accès au document de l'utilisateur
+        DocumentSnapshot doc =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .get();
+
+        if (doc.exists) {
+          var data = doc.data() as Map<String, dynamic>;
+
+          // Récupère l'âge et le genre directement
+          int age = data['age'] ?? 0;
+          String gender = data['gender'] ?? 'Inconnu';
+
+          // ✅ Affichage dans la console
+          print('Âge de l\'utilisateur : $age');
+          print('Genre de l\'utilisateur : $gender');
+
+          setState(() {
+            _age = age;
+            _gender = gender;
+          });
+        }
+      } else {
+        setState(() {
+          _resultat = 'Aucun utilisateur connecté.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _resultat = 'Erreur lors de la récupération des infos : $e';
+      });
+    }
+  }
+
+  /*------------------------- */
 
   Future<void> _pickImageFromGallery() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -29,7 +88,9 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
   }
 
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -37,36 +98,21 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
     }
   }
 
-
-/*Future<void> _sendImageToBackend(File imageFile) async {
-  var uri = Uri.parse('http://192.168.7.247:5000/extract');
-  var request = http.MultipartRequest('POST', uri);
-
-  request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
-
-  var response = await request.send();
-
-  if (response.statusCode == 200) {
-    final responseBody = await response.stream.bytesToString();
-    print("✅ Résultat du backend : $responseBody");
-
-    // Tu peux afficher le résultat dans l'UI ici
-  } else {
-    print("❌ Erreur backend : ${response.statusCode}");
-  }
-}*/
-
- Future<void> _analyserImage() async {
+  Future<void> _analyserImage() async {
     if (_image == null) return;
     setState(() {
       _isLoading = true;
     });
-
-    final uri = Uri.parse('http:// 192.168.1.39:5000/analyse');
+    print("Analyse en cours avec les infos suivantes :");
+    print("Âge : $_age");
+    print("Genre : $_gender");
+    final uri = Uri.parse('http://192.168.100.13:5000/analyse');
     var request =
         http.MultipartRequest('POST', uri)
-          ..fields['gender'] = 'homme'
-          ..fields['age'] = '30'
+          /*..fields['gender'] = 'homme'
+          ..fields['age'] = '30'*/
+          ..fields['gender'] = _gender!
+          ..fields['age'] = _age.toString()
           ..files.add(await http.MultipartFile.fromPath('image', _image!.path));
 
     var response = await request.send();
@@ -129,135 +175,144 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  Color(0xFFF7FBFF),
+      backgroundColor: Color(0xFFF7FBFF),
       appBar: AppBar(
-       // title: Text("Prédiction via Image"),
-       backgroundColor: Color(0xFFF7FBFF),
+        // title: Text("Prédiction via Image"),
+        backgroundColor: Color(0xFFF7FBFF),
       ),
-      body:
-      Container(
-        child:ListView(
-          children:[
+      body: Container(
+        child: ListView(
+          children: [
             Center(
-        
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            
-            children: [
-
-              const SizedBox(height: 20),
-              const Text(
-                "Bienvenue dans votre assistant de santé !",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                       
-                        fontSize: 27,
-                        fontWeight: FontWeight.w400,
-                        color:Color(0xFF4A90E2),
-                        height: 1.8,
-                        letterSpacing:1.5
-                      ),
-              ),
-              SizedBox(height:20),
-              const Text(
-                "Veuillez importer une image claire et lisible de votre test médical, et laissez notre système intelligent vous fournir une analyse rapide et fiable.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color:Colors.black,
-                        height: 1.5,
-                        letterSpacing:1.5
-                      ),
-                
-                
-              ),
-              const SizedBox(height: 40),
-              Container(
-                
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-                ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    Icon(Icons.cloud_upload, size: 50, color: Colors.blue),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Importer une image",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                   
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _pickImageFromGallery,
-                          icon: Icon(Icons.folder, color:Colors.white),
-                          label: Text("Parcourir",style:TextStyle(color:Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                    const Text(
+                      "Bienvenue dans votre assistant de santé !",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 27,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF4A90E2),
+                        height: 1.8,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    const Text(
+                      "Veuillez importer une image claire et lisible de votre test médical, et laissez notre système intelligent vous fournir une analyse rapide et fiable.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                        height: 1.5,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black12, blurRadius: 10),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.cloud_upload,
+                            size: 50,
+                            color: Colors.blue,
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        OutlinedButton.icon(
-                          onPressed: _pickImageFromCamera,
-                          icon: Icon(Icons.camera_alt),
-                          label: Text("Utiliser la caméra"),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                            side: BorderSide(color: Colors.blue),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "Importer une image",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    )
+                          const SizedBox(height: 8),
+
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: _pickImageFromGallery,
+                                icon: Icon(Icons.folder, color: Colors.white),
+                                label: Text(
+                                  "Parcourir",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              OutlinedButton.icon(
+                                onPressed: _pickImageFromCamera,
+                                icon: Icon(Icons.camera_alt),
+                                label: Text("Utiliser la caméra"),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.blue,
+                                  side: BorderSide(color: Colors.blue),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    if (_image != null)
+                      Column(
+                        children: [
+                          Text("Image sélectionnée :"),
+                          const SizedBox(height: 10),
+                          Image.file(_image!, height: 200),
+                          /*-------------------------------------------*/
+                         /* const SizedBox(height: 10),
+                          Text(
+                            "Âge détecté : $_age\nGenre détecté : $_gender",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),*/
+                          /*------------------------*/
+                          // 👉 Tu ajoutes le bouton ici :
+                          const SizedBox(height: 20),
+                          _isLoading
+                              ? CircularProgressIndicator()
+                              : ElevatedButton(
+                                onPressed: () async {
+                                  if (_image != null) {
+                                    await _analyserImage();
+                                  }
+                                },
+
+                                child: Text("Analyser l'image"),
+                              ),
+                        ],
+                      ),
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-              if (_image != null)
-                Column(
-                  children: [
-                    Text("Image sélectionnée :"),
-                    const SizedBox(height: 10),
-                    Image.file(_image!, height: 200),
-
-                     // 👉 Tu ajoutes le bouton ici :
-                     const SizedBox(height: 20),
-                     _isLoading
-        ? CircularProgressIndicator()
-        : ElevatedButton(
-           onPressed: () async {
-  if (_image != null) {
-    await _analyserImage();
-  }
-},
-
-            child: Text("Analyser l'image"),
-          ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-      ),
+            ),
           ],
         ),
       ),
-       
     );
   }
 }
-
-
-
-
-
