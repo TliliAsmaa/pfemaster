@@ -44,6 +44,7 @@ class PredictionData {
     return null;
   }
 
+  
   factory PredictionData.fromJson(Map<String, dynamic> json) {
     return PredictionData(
       ejectionFraction: toDoubleSafe(json['ejection_fraction']),
