@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pfemaster/component/textformfield.dart';
+import 'dart:math';
 
 /*class HomePage extends StatefulWidget {
   @override
@@ -80,7 +81,6 @@ void initState() {
     );
   }
 }*/
-
 
 //+===============================================//
 
@@ -183,9 +183,6 @@ class _HomePageState extends State<HomePage> {
     
   }}*/
 
-
- 
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -206,6 +203,8 @@ class _HomePageState extends State<HomePage> {
   int totalPredictions = 0;
   int highRiskCount = 0;
   int lowRiskCount = 0;
+  String? lastPrediction;
+  String? lastPredictionAdvice;
 
   @override
   void initState() {
@@ -213,16 +212,19 @@ class _HomePageState extends State<HomePage> {
     fetchUserData();
     _loadUserPhoto();
     fetchPredictionStats();
+    // fetchLastPrediction();
+
     // Choisir un conseil santé aléatoire à chaque ouverture
     currentHealthTip = healthTips[Random().nextInt(healthTips.length)];
   }
 
   Future<void> fetchUserData() async {
     if (user != null) {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
+      DocumentSnapshot doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .get();
 
       setState(() {
         userData = doc;
@@ -232,7 +234,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadUserPhoto() async {
     if (user != null) {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .get();
       if (doc.exists && doc.data() != null) {
         setState(() {
           photoUrl = doc.data()!['photoUrl'];
@@ -243,11 +249,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchPredictionStats() async {
     if (user != null) {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('predictions')
-        .get();
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .collection('predictions')
+              .get();
 
       int total = snapshot.docs.length;
       int high = 0;
@@ -255,7 +262,7 @@ class _HomePageState extends State<HomePage> {
 
       for (var doc in snapshot.docs) {
         String result = doc['result'].toString();
-        if (result == 'Risque élevé' ) {
+        if (result == 'Risque élevé') {
           high++;
         } else {
           low++;
@@ -270,6 +277,56 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /*Future<void> fetchLastPrediction() async {
+    if (user == null) return;
+
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .collection('predictions')
+              .orderBy('timestamp', descending: true)
+              .limit(1)
+              .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final result = snapshot.docs.first['result']?.toString();
+
+        setState(() {
+          lastPrediction = result;
+          print(lastPrediction);
+          if (result == "Pas de risque") {
+            lastPredictionAdvice = "Continuez à maintenir un mode de vie sain.";
+          } else if (result == "Risque faible") {
+            lastPredictionAdvice =
+                "Gardez une bonne hygiène de vie et refaites un contrôle bientôt.";
+          } else if (result == "Risque modéré") {
+            lastPredictionAdvice =
+                "Surveillez régulièrement vos symptômes et consultez un médecin si besoin.";
+          } else if (result == "Risque élevé") {
+            lastPredictionAdvice =
+                "Consultez immédiatement un professionnel de santé.";
+          } else {
+            lastPredictionAdvice =
+                "Restez attentif à tout changement dans votre santé.";
+          }
+        });
+      } else {
+        setState(() {
+          lastPrediction = "Aucune prédiction trouvée";
+          lastPredictionAdvice = null;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        lastPrediction = "Erreur lors de la récupération";
+        lastPredictionAdvice = null;
+      });
+      print("Erreur lors de fetchLastPrediction : $e");
+    }
+  }
+*/
   /*-----------------------------*/
   String currentHealthTip = "";
 
@@ -283,13 +340,11 @@ class _HomePageState extends State<HomePage> {
     "Faites des pauses régulières si vous travaillez assis.",
     "Faites un bilan de santé annuel.",
   ];
-  
+
   @override
   Widget build(BuildContext context) {
     if (userData == null) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     String fullName = userData!['full name'] ?? 'Nom non disponible';
@@ -302,9 +357,10 @@ class _HomePageState extends State<HomePage> {
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: CircleAvatar(
-            backgroundImage: photoUrl != null
-                ? NetworkImage(photoUrl!)
-                : AssetImage("images/upload.png") as ImageProvider,
+            backgroundImage:
+                photoUrl != null
+                    ? NetworkImage(photoUrl!)
+                    : AssetImage("images/upload.png") as ImageProvider,
           ),
         ),
         title: Text.rich(
@@ -332,7 +388,9 @@ class _HomePageState extends State<HomePage> {
               GoogleSignIn googleSignIn = GoogleSignIn();
               googleSignIn.disconnect();
               await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil("Login", (route) => false);
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil("Login", (route) => false);
             },
           ),
         ],
@@ -348,6 +406,14 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
                     bottomRight: Radius.circular(50),
@@ -357,11 +423,11 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Comment allez-vous \naujourd’hui ?",
+                      "Comment allez-vous /naujourd’hui ?",
                       style: TextStyle(
                         fontStyle: FontStyle.italic,
                         fontFamily: 'Roboto',
-                        fontSize: 30,
+                        fontSize: 30, 
                         fontWeight: FontWeight.w300,
                         color: Color.fromARGB(255, 23, 23, 23),
                         height: 1.8,
@@ -375,11 +441,18 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             Navigator.pushNamed(context, "formPrediction");
                           },
-                          label: Text("predict", style: TextStyle(color: Colors.white, fontSize: 16)),
+                          icon: Icon(Icons.analytics, size: 20),
+                          label: Text(
+                            "predict",
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF4A90E2),
                             minimumSize: Size(150, 50),
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
                             shape: StadiumBorder(),
                           ),
                         ),
@@ -387,11 +460,25 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             Navigator.pushNamed(context, 'imagePrediction');
                           },
-                          label: Text("caméra", style: TextStyle(fontSize: 16, color: Color(0xFF4A90E2))),
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: Color(0xFF4A90E2),
+                            size: 20,
+                          ),
+                          label: Text(
+                            "caméra",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF4A90E2),
+                            ),
+                          ),
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(150, 50),
                             backgroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
                             shape: StadiumBorder(),
                           ),
                         ),
@@ -401,48 +488,193 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 18),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 25),
+              SizedBox(height: 18),
 
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text("📈 Vos statistiques",
-                
-                 textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, 
-                 
-                  )),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "📈 Vos statistiques",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 6),
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: _buildColoredStatCard(
+                              icon: Icons.analytics,
+                              label: "Total Prédictions",
+                              value: totalPredictions.toString(),
+                              color: Colors.blueAccent,
+                              withContainer:
+                                  false, // on ne met pas de container interne ici
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 6),
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.redAccent.withOpacity(0.3),
+                                  spreadRadius: 2,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: _buildColoredStatCard(
+                              icon: Icons.warning,
+                              label: "Risque élevé",
+                              value: highRiskCount.toString(),
+                              color: Colors.redAccent,
+                              withContainer: false,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 6),
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green.withOpacity(0.3),
+                                  spreadRadius: 2,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: _buildColoredStatCard(
+                              icon: Icons.health_and_safety,
+                              label: "Risque faible",
+                              value: lowRiskCount.toString(),
+                              color: Colors.green,
+                              withContainer: false,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildStatCard("Prédictions", totalPredictions.toString()),
-                  _buildStatCard("Risque élevé", highRiskCount.toString()),
-                  _buildStatCard("Risque faible", lowRiskCount.toString()),
-                ],
+
+              /* Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "📝 Dernière prédiction",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.from(
+                              alpha: 1,
+                              red: 0.341,
+                              green: 0.298,
+                              blue: 0.922,
+                            ).withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Statut : ${lastPrediction ?? '...'}",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blueAccent,
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            Divider(color: Colors.grey[400]),
+                            SizedBox(height: 12),
+                            Text(
+                              "Conseil : ${lastPredictionAdvice ?? 'Consultez un spécialiste si vous ressentez des symptômes.'}",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 18),*/
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text("🧠 Conseils Santé",
-                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                   color: Color(0xFF2B2B2B),
-                   fontSize: 16,)),
+                child: Text(
+                  "🧠 Conseils Santé",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B2B2B),
+                    fontSize: 16,
+                  ),
+                ),
               ),
               SizedBox(height: 10),
               Card(
-                
                 margin: EdgeInsets.symmetric(horizontal: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 color: Color(0xFFD0F4DE),
                 child: ListTile(
                   leading: Icon(Icons.local_hospital, color: Colors.teal),
@@ -453,7 +685,10 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: Text(
                   "\"Un cœur en bonne santé, c’est un esprit apaisé.\" ❤️",
-                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey[700]),
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey[700],
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -464,26 +699,57 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildStatCard(String title, String count) {
-    return Container(
-      width: 110,
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      child: Column(
-        children: [
-          Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 4),
-          Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
-        ],
-      ),
+  Widget _buildColoredStatCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+    bool withContainer = true,
+  }) {
+    final cardContent = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 32, color: color),
+        SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, color: Colors.black87),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
+
+    if (withContainer) {
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: cardContent,
+      );
+    } else {
+      return cardContent;
+    }
   }
 }
-
 
   /*
             // 🟢 Dernière prédiction
