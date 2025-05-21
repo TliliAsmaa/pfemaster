@@ -105,14 +105,6 @@ Règles de remplissage :
 
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
-Si une valeur ne peut pas être extraite du texte OCR, utilise les statistiques suivants à la place pour remplir les champs du tableau "data".
-Ne laisse **aucun champ vide** dans "data" (non Null)
-Voici les statistiques moyennes du dataset pour remplir les champs manquants :
-- creatinine_phosphokinase : moyenne = 581.84, écart-type = 970.29, min = 23.0, max = 7861.0, médiane = 250.0
-- ejection_fraction : moyenne = 38.08, écart-type = 11.83, min = 14.0, max = 80.0, médiane = 38.0
-- platelets : moyenne = 263358.03, écart-type = 97804.24, min = 25100.0, max = 850000.0, médiane = 262000.0
-- serum_creatinine : moyenne = 1.39, écart-type = 1.03, min = 0.5, max = 9.4, médiane = 1.1
-- serum_sodium : moyenne = 136.63, écart-type = 4.41, min = 113.0, max = 148.0, médiane = 137.0
 
 Retourne un objet JSON strictement valide avec deux sections : "results" et "data". Ne mets aucun commentaire (pas de // ou /* ... */). Le JSON doit être parfaitement décodable sans aucune explication dans les valeurs. Toute explication doit être faite hors du JSON si nécessaire.
 
