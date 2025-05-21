@@ -6,48 +6,85 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'analyse_resultat.dart';
 import 'prediction_data.dart';
 
-class ResultatsPage extends StatelessWidget {
+class ResultatsPage extends StatefulWidget {
   final List<AnalyseResult> resultats;
   final List<PredictionData> resultats2;
+
   const ResultatsPage({
     Key? key,
     required this.resultats,
     required this.resultats2,
   }) : super(key: key);
 
-  /*Future<void> _sauvegarderTout(BuildContext context) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      print("Utilisateur non connecté");
-      return;
-    }
+  @override
+  State<ResultatsPage> createState() => _ResultatsPageState();
+}
 
-    try {
-      final collection = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('analyses');
+class _ResultatsPageState extends State<ResultatsPage> {
+  Map<String, dynamic> prediction_data = {};
 
-      for (var r in resultats) {
-        await collection.add({
-          'uid': user.uid,
-          'identifiant': r.identifiant,
-          'valeur': r.value,
-          'unite': r.measurement,
-          'interpretation': r.interpretation,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-      }
+  Future<void> _demanderTimeEtPredire(BuildContext context) async {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController followUpTimeController =
+        TextEditingController();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Résultats sauvegardés dans Firebase')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la sauvegarde : $e')),
-      );
-    }
-  }*/
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Information requise"),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 15),
+                const Text(
+                  "Temps de suivi",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: followUpTimeController,
+                  decoration: const InputDecoration(
+                    hintText: 'Temps de suivi (jour)',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Veuillez entrer le temps de suivi';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Annuler
+              },
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  setState(() {
+                    prediction_data['time'] =
+                        followUpTimeController.text.trim();
+                  });
+                  Navigator.of(context).pop();
+                  _fairePrediction(context);
+                }
+              },
+              child: const Text('Confirmer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> _sauvegarderTout(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -71,7 +108,7 @@ class ResultatsPage extends StatelessWidget {
       // Référence vers la sous-collection 'resultats' de cette analyse
       final resultatsCollection = nouvelleAnalyseRef.collection('resultats');
 
-      for (var r in resultats) {
+      for (var r in widget.resultats) {
         await resultatsCollection.add({
           'identifiant': r.identifiant,
           'valeur': r.value,
@@ -91,7 +128,7 @@ class ResultatsPage extends StatelessWidget {
   }
 
   void afficherPredictionData() {
-    for (var p in resultats2) {
+    for (var p in widget.resultats2) {
       print('--- PredictionData ---');
       print('Age : ${p.age}');
       print('Anaemia : ${p.anaemia}');
@@ -110,9 +147,9 @@ class ResultatsPage extends StatelessWidget {
   }
 
   Future<void> _fairePrediction(BuildContext context) async {
-    // Vérification que 'ejectionFraction' et 'serumCreatinine' ne sont pas nuls
-    if (resultats2[0].ejectionFraction == null ||
-        resultats2[0].serumCreatinine == null) {
+    final r = widget.resultats2[0];
+
+    if (r.ejectionFraction == null || r.serumCreatinine == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -120,26 +157,26 @@ class ResultatsPage extends StatelessWidget {
           ),
         ),
       );
-      return; // Arrêter la prédiction si les valeurs sont manquantes
+      return;
     }
-    // Préparation des données de prédiction à partir des résultats
-    final data = {
-      'age':
-          resultats2[0].age ??
-          0, // Adapte ceci en fonction des données disponibles
-      'anaemia': resultats2[0].anaemia ?? 0,
-      'creatinine_phosphokinase': resultats2[0].creatininePhosphokinase ?? 0.0,
-      'diabetes': resultats2[0].diabetes ?? 0,
-      'ejection_fraction': resultats2[0].ejectionFraction ?? 0.0,
-      'high_blood_pressure': resultats2[0].highBloodPressure ?? 0,
-      'platelets': resultats2[0].platelets ?? 0,
-      'serum_creatinine': resultats2[0].serumCreatinine ?? 0.0,
-      'serum_sodium': resultats2[0].serumSodium ?? 0.0,
-      'sex': resultats2[0].sex ?? 0,
-      'smoking': resultats2[0].smoking ?? 0,
-      'time': resultats2[0].time ?? 0,
-    };
 
+    final data = {
+      'age': r.age ?? 0,
+      'anaemia': r.anaemia ?? 0,
+      'creatinine_phosphokinase': r.creatininePhosphokinase ?? 0.0,
+      'diabetes': r.diabetes ?? 0,
+      'ejection_fraction': r.ejectionFraction ?? 0.0,
+      'high_blood_pressure': r.highBloodPressure ?? 0,
+      'platelets': r.platelets ?? 0,
+      'serum_creatinine': r.serumCreatinine ?? 0.0,
+      'serum_sodium': r.serumSodium ?? 0.0,
+      'sex': r.sex ?? 0,
+      'smoking': r.smoking ?? 0,
+      'time': prediction_data['time'] ?? r.time ?? 0,
+    };
+    print(
+      "🕒 Temps utilisé pour la prédiction : ${prediction_data['time'] ?? r.time ?? 0}",
+    );
     await sendToFlaskAPI(data, context);
   }
 
@@ -299,9 +336,9 @@ class ResultatsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool afficherBoutonPrediction =
-        resultats2.isNotEmpty &&
-        resultats2[0].ejectionFraction != null &&
-        resultats2[0].serumCreatinine != null;
+        widget.resultats2.isNotEmpty &&
+        widget.resultats2[0].ejectionFraction != null &&
+        widget.resultats2[0].serumCreatinine != null;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Résultats d'analyses")),
@@ -311,10 +348,10 @@ class ResultatsPage extends StatelessWidget {
         label: const Text("Sauvegarder"),
       ),
       body: ListView.builder(
-        itemCount: resultats.length + (afficherBoutonPrediction ? 1 : 0),
+        itemCount: widget.resultats.length + (afficherBoutonPrediction ? 1 : 0),
         itemBuilder: (context, index) {
-          if (index < resultats.length) {
-            final r = resultats[index];
+          if (index < widget.resultats.length) {
+            final r = widget.resultats[index];
             Color color;
             // String interpretationText;
 
@@ -392,8 +429,8 @@ class ResultatsPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: ElevatedButton(
                 onPressed: () {
+                  _demanderTimeEtPredire(context);
                   afficherPredictionData();
-                  _fairePrediction(context);
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
