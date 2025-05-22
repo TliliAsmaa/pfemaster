@@ -69,6 +69,7 @@ def analyse():
     image = request.files['image']
     gender = request.form.get('gender')
     age = request.form.get('age')
+    smoking = request.form.get('smoking', 'oui')
 
     save_path = os.path.join('uploads', image.filename)
     os.makedirs('uploads', exist_ok=True)
@@ -76,20 +77,21 @@ def analyse():
 
     # Appeler ton script Python (decryption.py)
     result = subprocess.run(
-        ['python', 'decryption.py', save_path, gender, age],
+        ['python', 'decryption.py', save_path, gender, age, smoking],
         capture_output=True, text=True
     )
 
     if result.returncode != 0:
+        print("Erreur script Python :", result.stderr)
         return jsonify({'error': 'Erreur script Python', 'details': result.stderr}), 500
 
     try:
         json_output = result.stdout
         return json_output
     except Exception as e:
+        print("Erreur parsing JSON :", str(e))
         return jsonify({'error': 'Erreur parsing JSON', 'details': str(e)}), 500
 
-
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=5000)
     app.run(host='0.0.0.0', port=port, debug=True)
