@@ -16,7 +16,7 @@ def try_rotations(gray_img):
             best_img = rotated
             best_angle = angle
 
-    print(f"Orientation choisie : {best_angle}°")
+    
     return best_img
 
 # 🔁 Fonction utilitaire pour faire pivoter une image selon un angle spécifique
@@ -38,7 +38,7 @@ def get_skew_angle(image):
     lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)  # Détection de lignes avec Hough
 
     if lines is None:
-        print("Aucune ligne détectée.")
+        
         return 0
 
     angles = []
@@ -52,7 +52,7 @@ def get_skew_angle(image):
         return 0
 
     median_angle = np.median(angles)  # Angle moyen des lignes détectées
-    print(f"Angle détecté (Hough) : {median_angle:.2f}°")
+    
     return median_angle
 
 # ↩️ Redresse l'image en utilisant l'angle détecté
