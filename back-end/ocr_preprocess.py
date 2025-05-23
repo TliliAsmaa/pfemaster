@@ -1,69 +1,93 @@
 import cv2
 import numpy as np
 import pytesseract
-import os
 
-# Fonction pour corriger l’inclinaison de l’image (deskew)
-def deskew(image):
-    # On récupère les coordonnées des pixels non noirs (présence de texte)
-    coords = np.column_stack(np.where(image > 0))
-    
-    # Si l’image est vide (aucun texte), on la retourne telle quelle
-    if coords.shape[0] == 0:
+def try_rotations(gray_img):
+    best_img = gray_img
+    max_len = 0
+    best_angle = 0
+
+    for angle in [0, 90, 180, 270]:
+        rotated = rotate_image(gray_img, angle)
+        text = pytesseract.image_to_string(rotated, config='--oem 3 --psm 6')
+        if len(text.strip()) > max_len:
+            max_len = len(text.strip())
+            best_img = rotated
+            best_angle = angle
+
+    print(f"Orientation choisie : {best_angle}°")
+    return best_img
+
+def rotate_image(image, angle):
+    if angle == 0:
         return image
+    elif angle == 90:
+        return cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif angle == 180:
+        return cv2.rotate(image, cv2.ROTATE_180)
+    elif angle == 270:
+        return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-    # On calcule l’angle de la boîte englobante minimale
-    angle = cv2.minAreaRect(coords)[-1]
+# 🔧 Nouvelle version robuste de deskew (pour textes inclinés)
+def get_skew_angle(image):
+    inverted = cv2.bitwise_not(image)
+    thresh = cv2.threshold(inverted, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    edges = cv2.Canny(thresh, 50, 150, apertureSize=3)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
 
-    # On ajuste l’angle selon sa valeur
-    if angle < -45:
-        angle = -(90 + angle)
-    else:
-        angle = -angle
+    if lines is None:
+        print("Aucune ligne détectée.")
+        return 0
 
-    # Calcul du centre de l’image
+    angles = []
+    for line in lines:
+        rho, theta = line[0]
+        angle = (theta * 180 / np.pi) - 90
+        if -45 < angle < 45:  # ignorer les verticales
+            angles.append(angle)
+
+    if len(angles) == 0:
+        return 0
+
+    median_angle = np.median(angles)
+    print(f"Angle détecté (Hough) : {median_angle:.2f}°")
+    return median_angle
+
+def deskew(image):
+    angle = get_skew_angle(image)
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
-
-    # Création de la matrice de rotation
     M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return rotated
 
-    # Application de la rotation à l’image
-    return cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-
-# Fonction principale pour charger, prétraiter et extraire le texte OCR d’une image
 def getmessage(imagefile):
-    # Chargement de l'image à partir du chemin fourni
     img = cv2.imread(imagefile)
-    
-    # Vérification que l’image a bien été chargée
     if img is None:
         raise ValueError("Image non chargée. Vérifiez le chemin ou l'intégrité du fichier.")
 
-    # Conversion de l’image en niveaux de gris
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Agrandissement de l’image pour améliorer l’OCR
-    resized = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+    # 🔄 Choisir la meilleure rotation automatiquement
+    rotated = try_rotations(gray)
 
-    # Application d’un seuillage adaptatif pour améliorer le contraste du texte
-    thresholded = cv2.adaptiveThreshold(
-        resized,
-        255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY,
-        65,   # Taille de bloc (doit être impair)
-        13    # Constante soustraite (ajustée empiriquement)
-    )
+    # 🔧 Correction de l’inclinaison (oblique)
+    deskewed = deskew(rotated)
 
     
-    # === Affichage de l’image après traitement ===
+
+    # 🔍 Redimensionnement et seuillage
+    resized = cv2.resize(deskewed, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+    thresholded = cv2.adaptiveThreshold(
+        resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY, 65, 13
+    )
+
+    # 🖼️ Affichage
     cv2.imshow("Image après prétraitement", thresholded)
-    cv2.waitKey(0)  # Attend que l'utilisateur appuie sur une touche
-    cv2.destroyAllWindows()  # Ferme la fenêtre
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    # === Extraction du texte via Tesseract OCR ===
-    custom_config = r'--oem 3 --psm 6'  # Configuration OCR
-    text = pytesseract.image_to_string(thresholded, config=custom_config)
-
+    # 🔠 OCR
+    text = pytesseract.image_to_string(thresholded, config='--oem 3 --psm 6')
     return text
