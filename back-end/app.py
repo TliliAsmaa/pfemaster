@@ -5,9 +5,11 @@ from flask_cors import CORS
 import joblib
 import numpy as np
 #import cv2
-#import pytesseract
+import pytesseract
 #import tempfile
 import os
+
+pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Chemin vers l'exécutable Tesseract
 app = Flask(__name__)
 CORS(app)
 # Charger ton modèle depuis un fichier .pkl
