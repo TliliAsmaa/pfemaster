@@ -2,7 +2,6 @@ Flask
 flask_cors
 joblib
 scikit-learn
-cv2
 pytesseract
 gunicorn
 opencv-python-headless
