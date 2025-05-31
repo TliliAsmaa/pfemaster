@@ -8,9 +8,15 @@ import numpy as np
 import pytesseract
 #import tempfile
 import os
+import logging
 
-pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Chemin vers l'exécutable Tesseract
 app = Flask(__name__)
+
+# Configuration du logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Chemin vers l'exécutable Tesseract
+
 CORS(app)
 # Charger ton modèle depuis un fichier .pkl
 model = joblib.load('modele_heart_failure.pkl2') # Remplace par le chemin de ton modèle
@@ -65,9 +71,17 @@ def predict():
 
 @app.route('/analyse', methods=['POST'])
 def analyse():
-    if 'image' not in request.files:
-        return jsonify({'error': 'Aucune image envoyée'}), 400
+     try:
+        # 1. Vérification du fichier image
+        if 'image' not in request.files:
+            logger.error("Aucun fichier image reçu")
+            return jsonify({'error': 'Aucune image envoyée'}), 400
 
+        image = request.files['image']
+        if image_file.filename == '':
+            logger.error("Nom de fichier vide")
+            return jsonify({'error': 'Nom de fichier vide'}), 400
+    
     image = request.files['image']
     gender = request.form.get('gender')
     age = request.form.get('age')
@@ -76,7 +90,7 @@ def analyse():
     save_path = os.path.join('uploads', image.filename)
     os.makedirs('uploads', exist_ok=True)
     image.save(save_path)
-
+    
     # Appeler ton script Python (decryption.py)
     result = subprocess.run(
         ['python', 'decryption.py', save_path, gender, age, smoking],
@@ -95,5 +109,6 @@ def analyse():
         return jsonify({'error': 'Erreur parsing JSON', 'details': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
     
