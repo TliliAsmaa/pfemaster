@@ -106,16 +106,17 @@ def deskew(image):
     return rotated
 
 # 🔍 Fonction principale de traitement d’image OCR
-def getmessage(imagefile,debug_mode=True):
-     try:
+# 🔍 Fonction principale de traitement d’image OCR
+def getmessage(imagefile, debug_mode=True):
+    try:
         # 1. Chargement de l'image
-        if isinstance(image_input, str):  # Si c'est un chemin de fichier
-            img = cv2.imread(image_input)
-        elif isinstance(image_input, bytes):  # Si ce sont des bytes
-            nparr = np.frombuffer(image_input, np.uint8)
+        if isinstance(imagefile, str):  # Si c'est un chemin de fichier
+            img = cv2.imread(imagefile)
+        elif isinstance(imagefile, bytes):  # Si ce sont des bytes
+            nparr = np.frombuffer(imagefile, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        elif isinstance(image_input, np.ndarray):  # Si c'est déjà un array numpy
-            img = image_input
+        elif isinstance(imagefile, np.ndarray):  # Si c'est déjà un array numpy
+            img = imagefile
         else:
             raise ValueError("Format d'image non supporté")
 
@@ -123,33 +124,31 @@ def getmessage(imagefile,debug_mode=True):
             raise ValueError("Impossible de charger l'image")
 
         if debug_mode:
-           save_image(img, "1. Image originale")
-   
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    save_image(gray, "2_gray.png")
+            save_image(img, "1. Image originale")
 
-    rotated = try_rotations(gray)
-    save_image(rotated, "3_rotated.png")
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        save_image(gray, "2_gray.png")
 
-    deskewed = deskew(rotated)
-    save_image(deskewed, "4_deskewed.png")
+        rotated = try_rotations(gray)
+        save_image(rotated, "3_rotated.png")
 
-    resized = cv2.resize(deskewed, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
-    save_image(resized, "5_resized.png")
+        deskewed = deskew(rotated)
+        save_image(deskewed, "4_deskewed.png")
 
-    thresholded = cv2.adaptiveThreshold(
-        resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY, 65, 13
-    )
-    save_image(thresholded, "6_thresholded.png")
+        resized = cv2.resize(deskewed, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+        save_image(resized, "5_resized.png")
 
-    text = pytesseract.image_to_string(thresholded, config='--oem 3 --psm 6')
-    logger.info("Traitement terminé avec succès")
-        
+        thresholded = cv2.adaptiveThreshold(
+            resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY, 65, 13
+        )
+        save_image(thresholded, "6_thresholded.png")
+
+        text = pytesseract.image_to_string(thresholded, config='--oem 3 --psm 6')
+        logger.info("Traitement terminé avec succès")
+
         return text.strip()
+
     except Exception as e:
         logger.error(f"Erreur lors du traitement: {str(e)}")
         raise
-
-
-
