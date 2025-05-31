@@ -1,25 +1,53 @@
 import cv2
 import numpy as np
 import pytesseract
+import matplotlib.pyplot as plt
+import os
+from PIL import Image, ExifTags
+import io
+import tempfile
+import logging
+from io import BytesIO
 
-# 🔄 Essaie plusieurs rotations (0°, 90°, 180°, 270°) et retourne celle qui donne le plus de texte reconnu par OCR
-def try_rotations(gray_img):
-    best_img = gray_img
-    max_len = 0
-    best_angle = 0
+# Configuration du logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+def fix_orientation(imagefile):
+    image = Image.open(imagefile)
 
-    for angle in [0, 90, 180, 270]:
-        rotated = rotate_image(gray_img, angle)
-        text = pytesseract.image_to_string(rotated, config='--oem 3 --psm 6')
-        if len(text.strip()) > max_len:
-            max_len = len(text.strip())
-            best_img = rotated
-            best_angle = angle
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
 
-    print(f"Orientation choisie : {best_angle}°")
-    return best_img
+        exif = dict(image._getexif().items())
 
-# 🔁 Fonction utilitaire pour faire pivoter une image selon un angle spécifique
+        if exif[orientation] == 3:
+            image = image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image = image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image = image.rotate(90, expand=True)
+
+    except (AttributeError, KeyError, IndexError):
+        # L’image n’a pas de données EXIF ou orientation manquante
+        pass
+
+    return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+# 📁 Enregistre une image dans le dossier 'img'
+def save_image(img, filename, cmap="gray"):
+    output_dir = "img"
+    os.makedirs(output_dir, exist_ok=True)
+    path = os.path.join(output_dir, filename)
+
+    if len(img.shape) == 2:
+        plt.imsave(path, img, cmap=cmap)
+    else:
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        plt.imsave(path, img_rgb)
+
+# 🔁 Fait pivoter une image selon un angle
 def rotate_image(image, angle):
     if angle == 0:
         return image
@@ -30,32 +58,45 @@ def rotate_image(image, angle):
     elif angle == 270:
         return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-# 📐 Détecte l'angle d'inclinaison d'un texte dans l'image en utilisant la transformée de Hough
+# 🔄 Essaie plusieurs rotations et retourne celle avec le plus de texte détecté
+def try_rotations(gray_img):
+    best_img = gray_img
+    max_len = 0
+    best_angle = 0
+
+    for angle in [0, 90, 180, 270]:
+        rotated = rotate_image(gray_img, angle)
+        text = pytesseract.image_to_string(rotated,lang='fra', config='--oem 3 --psm 6')
+        if len(text.strip()) > max_len:
+            max_len = len(text.strip())
+            best_img = rotated
+            best_angle = angle
+
+    return best_img
+
+# 📐 Détecte l’angle d’inclinaison du texte avec Hough Transform
 def get_skew_angle(image):
-    inverted = cv2.bitwise_not(image)  # Inversion des couleurs (texte noir sur fond blanc)
+    inverted = cv2.bitwise_not(image)
     thresh = cv2.threshold(inverted, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-    edges = cv2.Canny(thresh, 50, 150, apertureSize=3)  # Détection de contours
-    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)  # Détection de lignes avec Hough
+    edges = cv2.Canny(thresh, 50, 150, apertureSize=3)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
 
     if lines is None:
-        print("Aucune ligne détectée.")
         return 0
 
     angles = []
     for line in lines:
         rho, theta = line[0]
-        angle = (theta * 180 / np.pi) - 90  # Conversion de radians en degrés
-        if -45 < angle < 45:  # Ignore les lignes trop verticales
+        angle = (theta * 180 / np.pi) - 90
+        if -45 < angle < 45:
             angles.append(angle)
 
     if len(angles) == 0:
         return 0
 
-    median_angle = np.median(angles)  # Angle moyen des lignes détectées
-    print(f"Angle détecté (Hough) : {median_angle:.2f}°")
-    return median_angle
+    return np.median(angles)
 
-# ↩️ Redresse l'image en utilisant l'angle détecté
+# ↩️ Corrige l’inclinaison de l’image
 def deskew(image):
     angle = get_skew_angle(image)
     (h, w) = image.shape[:2]
@@ -64,36 +105,53 @@ def deskew(image):
     rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     return rotated
 
-# 🔍 Fonction principale : lit une image, prétraite et effectue l’OCR
-def getmessage(imagefile):
-    # 📥 Lecture de l'image
-    img = cv2.imread(imagefile)
-    if img is None:
-        raise ValueError("Image non chargée. Vérifiez le chemin ou l'intégrité du fichier.")
+# 🔍 Fonction principale de traitement d’image OCR
+def getmessage(imagefile,debug_mode=True):
+     try:
+        # 1. Chargement de l'image
+        if isinstance(image_input, str):  # Si c'est un chemin de fichier
+            img = cv2.imread(image_input)
+        elif isinstance(image_input, bytes):  # Si ce sont des bytes
+            nparr = np.frombuffer(image_input, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        elif isinstance(image_input, np.ndarray):  # Si c'est déjà un array numpy
+            img = image_input
+        else:
+            raise ValueError("Format d'image non supporté")
 
-    # ⚫ Conversion en niveaux de gris
+        if img is None:
+            raise ValueError("Impossible de charger l'image")
+
+        if debug_mode:
+           save_image(img, "1. Image originale")
+   
+
+    
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    save_image(gray, "2_gray.png")
 
-    # 🔄 Rotation pour corriger l’orientation globale
     rotated = try_rotations(gray)
+    save_image(rotated, "3_rotated.png")
 
-    # ↩️ Redressement du texte (si incliné)
     deskewed = deskew(rotated)
+    save_image(deskewed, "4_deskewed.png")
 
-    # 🔍 Agrandissement pour améliorer la précision OCR
     resized = cv2.resize(deskewed, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+    save_image(resized, "5_resized.png")
 
-    # 🧪 Seuillage adaptatif pour binariser l'image
     thresholded = cv2.adaptiveThreshold(
         resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY, 65, 13
     )
+    save_image(thresholded, "6_thresholded.png")
 
-    # 🖼️ Affichage de l’image traitée pour débogage
-    cv2.imshow("Image après prétraitement", thresholded)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    # 🔠 Lecture du texte avec OCR (Tesseract)
     text = pytesseract.image_to_string(thresholded, config='--oem 3 --psm 6')
-    return text
+    logger.info("Traitement terminé avec succès")
+        
+        return text.strip()
+    except Exception as e:
+        logger.error(f"Erreur lors du traitement: {str(e)}")
+        raise
+
+

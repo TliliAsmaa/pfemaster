@@ -15,12 +15,6 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY")) # Remplace par ta vraie cl√
 model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
 
 
-
-
-
-
-
-
 if len(sys.argv) != 5:
     print("Usage : python script.py <image_path> <gender> <age> <smoking>")
     sys.exit(1)
