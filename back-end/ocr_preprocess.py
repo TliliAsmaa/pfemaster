@@ -124,7 +124,7 @@ def getmessage(imagefile, debug_mode=True):
             raise ValueError("Impossible de charger l'image")
 
         if debug_mode:
-            save_image(img, "1. Image originale")
+            save_image(img, "1. Image originale.png")
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         save_image(gray, "2_gray.png")
