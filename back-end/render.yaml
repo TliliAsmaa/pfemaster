@@ -2,9 +2,9 @@ services:
   - type: web
     name: flask-api
     runtime: python
-    buildCommand: ./build.sh
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
-    env: python
+    env: docker
     region: frankfurt
     plan: free
     envVars:

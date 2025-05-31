@@ -1,0 +1,26 @@
+# On part d'une image Python légère officielle
+FROM python:3.11-slim
+
+# Installer Tesseract et les librairies système nécessaires
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+    && apt-get clean
+
+# Définir le dossier de travail dans le container
+WORKDIR /app
+
+# Copier le fichier des dépendances Python
+COPY requirements.txt .
+
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier tout le code dans le container
+COPY . .
+
+# Commande par défaut pour lancer ton script (à adapter selon ton fichier principal)
+CMD ["python", "back-end/app.py"]
