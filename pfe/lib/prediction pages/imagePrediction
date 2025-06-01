@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,7 +76,7 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
 
   /*------------------------- */
 
-  Future<void> _pickImageFromGallery() async {
+  /*Future<void> _pickImageFromGallery() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
@@ -85,9 +85,18 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
         _image = File(pickedFile.path);
       });
     }
+  }*/
+  Future<void> _pickImageFromGallery() async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (pickedFile != null) {
+    final fixedImage = await FlutterExifRotation.rotateImage(path: pickedFile.path);
+    setState(() {
+      _image = fixedImage;
+    });
   }
+}
 
-  Future<void> _pickImageFromCamera() async {
+ /* Future<void> _pickImageFromCamera() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
     );
@@ -96,7 +105,16 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
         _image = File(pickedFile.path);
       });
     }
+  }*/
+  Future<void> _pickImageFromCamera() async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+  if (pickedFile != null) {
+    final fixedImage = await FlutterExifRotation.rotateImage(path: pickedFile.path);
+    setState(() {
+      _image = fixedImage;
+    });
   }
+}
 
   Future<void> _analyserImage() async {
     if (_image == null) return;
@@ -106,7 +124,7 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
     print("Analyse en cours avec les infos suivantes :");
     print("Âge : $_age");
     print("Genre : $_gender");
-    final uri = Uri.parse('http://192.168.100.13:5000/analyse');
+    final uri = Uri.parse('http://192.168.1.36:5000/analyse');
     var request =
         http.MultipartRequest('POST', uri)
           /*..fields['gender'] = 'homme'

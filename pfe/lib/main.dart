@@ -11,7 +11,7 @@ import 'package:pfemaster/bottomnavbar.dart';
 
 import 'package:pfemaster/homepage.dart';
 import 'package:pfemaster/modifieprofile.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 import 'package:pfemaster/prediction%20pages/formPrediction.dart';
 import 'package:pfemaster/prediction%20pages/imagePrediction';
@@ -20,7 +20,7 @@ void main() async{
 
     WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await dotenv.load(fileName: ".env");
+ 
 
 
   runApp(MyApp());

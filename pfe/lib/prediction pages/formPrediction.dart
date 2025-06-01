@@ -78,11 +78,12 @@ void clearForm() {
       // Formulaire valide, envoyer les données
 
         // Récupérer le sexe et le convertir en 1 ou 0
+        int age = userData!['age'];
     String gender = userData!['gender'];  // récupère la valeur 'male' ou 'female'
     int genderValue = gender == 'male' ? 1 : 0;  // 1 pour homme, 0 pour femme
       final formData = {
-      //  'age': int.parse(userData!['age']),
-      'age' : int.parse(ageController.text),
+        'age': age,
+      //'age' : int.parse(ageController.text),
         'anaemia': anaemia,
         'creatinine_phosphokinase': double.parse(creatinineController.text),
         'diabetes': diabetes,
@@ -320,7 +321,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
           'uid': user.uid,
           'result': prediction == 1 ? "Risque élevé" : "Pas de risque",
           'timestamp': FieldValue.serverTimestamp(),
-          'age' : int.parse(ageController.text),
+          'age': int.parse(userData!['age']),
         'anaemia': anaemia,
         'creatinine_phosphokinase': double.parse(creatinineController.text),
         'diabetes': diabetes,

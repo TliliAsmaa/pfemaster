@@ -423,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Comment allez-vous /naujourd’hui ?",
+                      "Comment allez-vous \aujourd’hui ?",
                       style: TextStyle(
                         fontStyle: FontStyle.italic,
                         fontFamily: 'Roboto',

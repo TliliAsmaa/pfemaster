@@ -15,7 +15,7 @@ app = Flask(__name__)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Chemin vers l'exécutable Tesseract
+pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'  # Chemin vers l'exécutable Tesseract
 
 CORS(app)
 # Charger ton modèle depuis un fichier .pkl

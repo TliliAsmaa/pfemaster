@@ -111,7 +111,9 @@ def getmessage(imagefile, debug_mode=True):
     try:
         # 1. Chargement de l'image
         if isinstance(imagefile, str):  # Si c'est un chemin de fichier
-            img = cv2.imread(imagefile)
+            img = fix_orientation(imagefile) 
+            logger.info("Orientation corrigée avec PIL + EXIF")
+                # Utilise PIL pour corriger la rotation
         elif isinstance(imagefile, bytes):  # Si ce sont des bytes
             nparr = np.frombuffer(imagefile, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
