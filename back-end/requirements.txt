@@ -11,3 +11,4 @@ python-dotenv
 pillow
 requests
 matplotlib
+opencv-python

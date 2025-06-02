@@ -15,8 +15,9 @@ app = Flask(__name__)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'  # Chemin vers l'exécutable Tesseract
-
+#pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'  # Chemin vers l'exécutable Tesseract
+# Le chemin typique pour Ubuntu sur Render après installation via apt
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 CORS(app)
 # Charger ton modèle depuis un fichier .pkl
 model = joblib.load('modele_heart_failure.pkl2') # Remplace par le chemin de ton modèle

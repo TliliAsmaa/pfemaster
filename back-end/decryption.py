@@ -26,9 +26,14 @@ smoking = sys.argv[4]
 
 
 message = ocr_preprocess.getmessage(image_path)
+
 message = message.replace('\n', ' ')
 message = re.sub(r'\d{2}-\d{2}-\d{2,4}', '', message)
-
+if not message.strip():
+    print(json.dumps({
+        "error": "Le texte OCR est vide. Merci de reprendre une image plus claire."
+    }))
+    sys.exit(0)
 if message:
     sex_num = 1 if gender.lower() in ['homme', 'male', 'masculin'] else 0
     smoking_num = 1 if smoking.lower() in ['oui', 'yes', 'true', 'smoker'] else 0
