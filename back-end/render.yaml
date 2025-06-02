@@ -2,6 +2,8 @@ services:
   - type: web
     name: flask-api
     env: docker
+    buildCommand: docker build -t mon-ocr-app .
+    startCommand: docker run -p 5000:5000 mon-ocr-app
     region: frankfurt
     plan: free
     envVars:

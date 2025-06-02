@@ -17,7 +17,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r back-end/requirements.txt
 
 # Copier tout le code dans le container
 COPY . .
@@ -25,4 +25,4 @@ EXPOSE 5000
 
 
 # Commande par défaut pour lancer ton script (à adapter selon ton fichier principal)
-CMD ["python", "app.py"]
+CMD ["python", "back-end/app.py"]
