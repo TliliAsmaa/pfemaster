@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 # Le chemin typique pour Ubuntu sur Render après installation via apt
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 CORS(app)
-"""# Charger ton modèle depuis un fichier .pkl
-/*model = joblib.load('back-end/modele_heart_failure.pkl2')
+# Charger ton modèle depuis un fichier .pkl
+model = joblib.load('back-end/modele_heart_failure.pkl2')
 # Remplace par le chemin de ton modèle
 pca = joblib.load('back-end/pca_model.pkl2')  # Modèle PCA
 @app.route('/predict', methods=['POST'])
@@ -63,7 +63,7 @@ def predict():
     
     except Exception as e:
         return jsonify({'error': str(e)})
-"""
+
 #if __name__ == '__main__':
     #port = int(os.environ.get('PORT', 5000))  # Render fournit un PORT
     #app.run(debug=True,host='0.0.0.0', port=port)
