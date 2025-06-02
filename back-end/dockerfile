@@ -4,6 +4,7 @@ FROM python:3.11-slim
 # Installer Tesseract et les librairies système nécessaires
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-fra \
     libglib2.0-0 \
     libsm6 \
     libxrender1 \
