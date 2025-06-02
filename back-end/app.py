@@ -94,7 +94,7 @@ def analyse():
 
         # Appeler ton script Python (decryption.py)
         result = subprocess.run(
-            ['python', 'backend/decryption.py', save_path, gender, age, smoking],
+            ['python', 'back-end/decryption.py', save_path, gender, age, smoking],
             capture_output=True, text=True, timeout=180
         )
 
