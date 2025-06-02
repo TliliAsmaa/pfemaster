@@ -15,6 +15,7 @@ WORKDIR /app
 
 # Copier tout le dossier back-end dans /app/back-end du container
 COPY back-end /app/back-end
+COPY back-end /app/
 
 # Installer les dépendances (en partant du requirements.txt qui est maintenant dans /app/back-end)
 RUN pip install --no-cache-dir -r /app/back-end/requirements.txt

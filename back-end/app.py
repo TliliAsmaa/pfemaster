@@ -88,13 +88,13 @@ def analyse():
         age = request.form.get('age')
         smoking = request.form.get('smoking', 'oui')
 
-        save_path = os.path.join('uploads', image_file.filename)
-        os.makedirs('uploads', exist_ok=True)
+        save_path = os.path.join('back-end/uploads', image_file.filename)
+        os.makedirs('back-end/uploads', exist_ok=True)
         image_file.save(save_path)
 
         # Appeler ton script Python (decryption.py)
         result = subprocess.run(
-            ['python', 'decryption.py', save_path, gender, age, smoking],
+            ['python', 'backend/decryption.py', save_path, gender, age, smoking],
             capture_output=True, text=True, timeout=180
         )
 
