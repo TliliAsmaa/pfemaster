@@ -17,7 +17,7 @@ import 'package:pfemaster/prediction%20pages/formPrediction.dart';
 import 'package:pfemaster/prediction%20pages/imagePrediction';
 void main() async{
   
-
+   
     WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
  
