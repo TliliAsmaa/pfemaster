@@ -23,4 +23,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Commande par défaut pour lancer ton script (à adapter selon ton fichier principal)
-CMD ["python", "back-end/app.py"]
+CMD ["python", "app.py"]
