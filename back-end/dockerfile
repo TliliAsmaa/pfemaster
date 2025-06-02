@@ -8,22 +8,22 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxrender1 \
     libxext6 \
-    && apt-get clean
+    libgl1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Définir le dossier de travail dans le container
 WORKDIR /app
 
-# Copier tout le dossier back-end dans /app/back-end du container
+# Copier les fichiers du backend
 COPY back-end /app/back-end
-COPY back-end /app/
 
-# Installer les dépendances (en partant du requirements.txt qui est maintenant dans /app/back-end)
+# Installer les dépendances Python (depuis le bon chemin)
 RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
 
-# Copier tout le code dans le container
-COPY . .
+# Exposer le port utilisé par Flask
 EXPOSE 5000
 
-
-# Commande par défaut pour lancer ton script (à adapter selon ton fichier principal)
+# Commande pour lancer l'application
 CMD ["python", "back-end/app.py"]
+
