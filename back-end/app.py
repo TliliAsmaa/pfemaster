@@ -20,8 +20,9 @@ logger = logging.getLogger(__name__)
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 CORS(app)
 # Charger ton modèle depuis un fichier .pkl
-model = joblib.load('modele_heart_failure.pkl2') # Remplace par le chemin de ton modèle
-pca = joblib.load('pca_model.pkl2')  # Modèle PCA
+model = joblib.load('back-end/modele_heart_failure.pkl2')
+# Remplace par le chemin de ton modèle
+pca = joblib.load('back-end/pca_model.pkl2')  # Modèle PCA
 @app.route('/predict', methods=['POST'])
 def predict():
     try:

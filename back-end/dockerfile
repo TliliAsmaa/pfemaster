@@ -13,10 +13,11 @@ RUN apt-get update && apt-get install -y \
 # Définir le dossier de travail dans le container
 WORKDIR /app
 
-# Copier le fichier des dépendances Python
-COPY back-end/requirements.txt back-end/requirements.txt
-RUN pip install --no-cache-dir -r back-end/requirements.txt
+# Copier tout le dossier back-end dans /app/back-end du container
+COPY back-end /app/back-end
 
+# Installer les dépendances (en partant du requirements.txt qui est maintenant dans /app/back-end)
+RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
 
 # Copier tout le code dans le container
 COPY . .
