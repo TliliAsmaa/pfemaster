@@ -5,6 +5,10 @@ import json
 import ocr_preprocess
 import google.generativeai as genai
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -23,10 +27,14 @@ image_path = sys.argv[1]
 gender = sys.argv[2]
 age = sys.argv[3]
 smoking = sys.argv[4]
+logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
+logger = logging.getLogger(__name__)
 
+
+logger.info(f"Décryptage de l'image : {image_path}, gender={gender}, age={age}, smoking={smoking}")
 
 message = ocr_preprocess.getmessage(image_path)
-
+logger.info(f"Texte OCR extrait : {message}")
 message = message.replace('\n', ' ')
 message = re.sub(r'\d{2}-\d{2}-\d{2,4}', '', message)
 if not message.strip():
@@ -37,6 +45,8 @@ if not message.strip():
 if message:
     sex_num = 1 if gender.lower() in ['homme', 'male', 'masculin'] else 0
     smoking_num = 1 if smoking.lower() in ['oui', 'yes', 'true', 'smoker'] else 0
+
+
 
     prompt = f"""
 Tu es un assistant médical expert.
@@ -114,7 +124,12 @@ Retourne un objet JSON strictement valide avec deux sections : "results" et "dat
     try:
         response = model.generate_content(prompt)
         reply = response.text.strip()
-
+        # 🟡 Ajoute cette partie ici
+        if ('"results"' not in reply and '"data"' not in reply):
+            print(json.dumps({
+                "error": "Le texte OCR semble incompréhensible. Merci de reprendre une image plus lisible."
+            }))
+            sys.exit(0)
         # Nettoyer automatiquement les balises Markdown inutiles
         if reply.startswith('```json'):
             reply = reply.replace('```json', '').strip()
