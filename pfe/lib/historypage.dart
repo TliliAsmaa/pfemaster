@@ -22,24 +22,124 @@ class _HistoryPageState extends State<HistoryPage> {
     DateTime dateTime = timestamp.toDate();
     return "${dateTime.day}/${dateTime.month}/${dateTime.year} à ${dateTime.hour}:${dateTime.minute}";
   }
+void _showAnalysisDetails(BuildContext context, String details) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Column(
+          children: [
+            Text(
+              "Détails de l'Analyse",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+                letterSpacing: 1.2,
+              ),
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1.8,
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(details, style: TextStyle(fontSize: 16)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: TextButton.styleFrom(
+              backgroundColor: Color(0xFFF7FBFF),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: Color(0xFFF7FBFF), width: 1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Fermer',
+              style: TextStyle(
+                color: Color(0xFF4A90E2),
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
-  // Fonction pour afficher les détails
-  void _showDetails(BuildContext context, String details) {
+// Fonction pour afficher les détails
+void _showDetails(BuildContext context, Map<String, dynamic> predictionData) {
+  String details = '''
+result : ${predictionData['result']}
+Date : ${_formatDate(predictionData['timestamp'])}
+Âge : ${predictionData['age']}
+Sexe : ${predictionData['sex'] == 1 ? 'Homme' : 'Femme'}
+Anémie : ${predictionData['anaemia'] == 1 ? 'Oui' : 'Non'}
+Diabète : ${predictionData['diabetes'] == 1 ? 'Oui' : 'Non'}
+Hypertension : ${predictionData['high_blood_pressure'] == 1 ? 'Oui' : 'Non'}
+Fumeur : ${predictionData['smoking'] == 1 ? 'Oui' : 'Non'}
+Créatinine phosphokinase : ${predictionData['creatinine_phosphokinase']}
+Fraction d’éjection : ${predictionData['ejection_fraction']}%
+Plaquettes : ${predictionData['platelets']}
+Créatinine sérique : ${predictionData['serum_creatinine']}
+Sodium sérique : ${predictionData['serum_sodium']}
+Durée de suivi (jours) : ${predictionData['time']}
+''';
+
     showDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: Text("Détails"),
-            content: Text(details),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Fermer"),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Text(
+                "Détails de la Prédiction",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              Divider(
+                color: Colors.grey,
+                thickness: 1.8,
               ),
             ],
           ),
+          content: SingleChildScrollView(
+            child: Text(details, style: TextStyle(fontSize: 16)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                backgroundColor: Color(0xFFF7FBFF),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Color(0xFFF7FBFF), width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Fermer',
+                style: TextStyle(
+                  color: Color(0xFF4A90E2),
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
+
+    
+  
 
   Widget _buildPredictionHistory() {
     if (userId == null) return Center(child: Text("Utilisateur non connecté"));
@@ -50,7 +150,7 @@ class _HistoryPageState extends State<HistoryPage> {
               .collection('users')
               .doc(userId)
               .collection('predictions')
-              .orderBy('timestamp', descending: true)
+              .orderBy('timestamp', descending: false)
               .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
@@ -73,15 +173,13 @@ class _HistoryPageState extends State<HistoryPage> {
             if (result == 'Risque élevé') {
               resultColor = Colors.red;
               resultIcon = Icons.error;
-            } else if (result == 'Normal') {
+            } else  {
               resultColor = Colors.green;
               resultIcon = Icons.check_circle;
-            } else {
-              resultColor = Colors.orange;
-              resultIcon = Icons.warning;
-            }
+            } 
 
             return Card(
+              color: Colors.white,
               margin: EdgeInsets.symmetric(vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -104,10 +202,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                     trailing: Icon(resultIcon, color: resultColor),
                     onTap: () {
-                      _showDetails(
-                        context,
-                        "Détails supplémentaires à venir...",
-                      );
+                       _showDetails(context, prediction.data() as Map<String, dynamic>);
                     },
                   ),
                   Divider(color: Colors.grey.shade300, thickness: 1.5),
@@ -186,6 +281,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     final resultats = snapshotResultats.data!.docs;
 
                     return Card(
+                      color:Colors.white,
                       margin: EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -237,7 +333,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   ],
                                 ),
                                 onTap: () {
-                                  _showDetails(
+                                  _showAnalysisDetails(
                                     context,
                                     "Test : $identifiant\nValeur : $valeur $unite\nInterprétation : $interpretation\nDate : $formattedDate",
                                   );
@@ -256,23 +352,31 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Historique'),
-          backgroundColor: Color(0xFF5C6BC0),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: "Prédictions", icon: Icon(Icons.analytics)),
-              Tab(text: "Analyses", icon: Icon(Icons.medical_services)),
-            ],
-          ),
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      backgroundColor: Color(0xFFF7FBFF),
+      appBar: AppBar(
+        title: Text(
+          'Historique',
+          style: TextStyle(color: Colors.black), // Titre en noir
         ),
-        body: TabBarView(
-          children: [_buildPredictionHistory(), _buildAnalysisHistory()],
+        backgroundColor: Colors.white,
+        bottom: TabBar(
+          labelColor: Colors.blue, // Couleur des icônes et textes sélectionnés
+          unselectedLabelColor: Colors.grey, // Couleur des icônes et textes non sélectionnés
+          indicatorColor: Colors.blue, // Couleur de la ligne sous l'onglet actif
+          tabs: [
+            Tab(text: "Prédictions", icon: Icon(Icons.analytics)),
+            Tab(text: "Analyses", icon: Icon(Icons.medical_services)),
+          ],
         ),
+        iconTheme: IconThemeData(color: Colors.black), // Pour les icônes dans AppBar
       ),
-    );
-  }
+      body: TabBarView(
+        children: [_buildPredictionHistory(), _buildAnalysisHistory()],
+      ),
+    ),
+  );
+}
 }

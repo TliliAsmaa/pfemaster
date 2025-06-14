@@ -115,7 +115,7 @@ Future<void> sendToFlaskAPI(Map<String, dynamic> formData) async {
 
   try {
     // URL de ton API Flask (remplace par l'URL réelle de ton API)
-    Uri apiUrl = Uri.parse('https://pfemaster-3.onrender.com/predict'); // Remplace par l'URL de ton API
+    Uri apiUrl = Uri.parse('http://192.168.1.38:5000/predict'); // Remplace par l'URL de ton API
 
     // Effectuer la requête POST avec les données en format JSON
     final response = await http.post(
@@ -321,19 +321,18 @@ Future<void> savePredictionToFirestore(int prediction) async {
           'uid': user.uid,
           'result': prediction == 1 ? "Risque élevé" : "Pas de risque",
           'timestamp': FieldValue.serverTimestamp(),
-          'age': int.parse(userData!['age']),
-        'anaemia': anaemia,
-        'creatinine_phosphokinase': double.parse(creatinineController.text),
-        'diabetes': diabetes,
-        'ejection_fraction': double.parse(ejectionFractionController.text),
-        'high_blood_pressure': hypertension,
-        'platelets': int.parse(plateletsController.text),
-        'serum_creatinine': double.parse(serumCreatinineController.text),
-        'serum_sodium': double.parse(serumSodiumController.text),
-       
-        'sex' : genderValue,
-        'smoking': smoking,
-        'time': int.parse(followUpTimeController.text),
+          'age': userData!['age'],
+          'anaemia': anaemia,
+          'creatinine_phosphokinase': double.parse(creatinineController.text),
+          'diabetes': diabetes,
+          'ejection_fraction': double.parse(ejectionFractionController.text),
+          'high_blood_pressure': hypertension,
+          'platelets': int.parse(plateletsController.text),
+          'serum_creatinine': double.parse(serumCreatinineController.text),
+          'serum_sodium': double.parse(serumSodiumController.text),
+          'sex' : genderValue,
+          'smoking': smoking,
+          'time': int.parse(followUpTimeController.text),
         });
     print("Prédiction sauvegardée avec succès");
   } catch (e) {

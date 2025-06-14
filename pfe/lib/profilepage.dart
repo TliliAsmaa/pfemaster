@@ -30,22 +30,12 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           userData = doc.data() as Map<String, dynamic>?;
         });
-        fetchProfileImage();
+       
       }
     }
   }
 
-  Future<void> fetchProfileImage() async {
-    try {
-      final ref = FirebaseStorage.instance.ref().child('profile_pics/${user!.uid}.jpg');
-      final url = await ref.getDownloadURL();
-      setState(() {
-        profileImageUrl = url;
-      });
-    } catch (e) {
-      print("Pas de photo trouvée");
-    }
-  }
+ 
 
   void logout() async {
     await FirebaseAuth.instance.signOut();
@@ -72,11 +62,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Color(0xFFF7FBFF),
       appBar: AppBar(
         title: Text("Mon Profil"),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.white,
       ),
       body: userData == null
           ? Center(child: CircularProgressIndicator())
@@ -84,12 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: profileImageUrl != null
-                        ? NetworkImage(profileImageUrl!)
-                        : AssetImage('assets/avatar.png') as ImageProvider,
-                  ),
+                  
                   const SizedBox(height: 16),
                   Text(
                     userData!['full name'] ?? 'Nom inconnu',

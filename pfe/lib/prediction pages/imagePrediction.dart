@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:open_file/open_file.dart';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +14,9 @@ import 'package:path/path.dart' as p;
 import 'analyse_resultat.dart';
 import 'resultats_page.dart';
 import 'prediction_data.dart';
-
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 class ImagePredictionPage extends StatefulWidget {
   const ImagePredictionPage({super.key});
 
@@ -77,7 +81,7 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
 
   /*------------------------- */
 
-  /*Future<void> _pickImageFromGallery() async {
+  Future<void> _pickImageFromGallery() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
@@ -86,33 +90,11 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
         _image = File(pickedFile.path);
       });
     }
-  }*/
-  Future<void> _pickImageFromGallery() async {
-  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-  if (pickedFile == null) return;
-
-  final fixedImage = await FlutterExifRotation.rotateImage(path: pickedFile.path);
-
-  // ✅ Utilise un dossier sûr dans l'espace de l'application
-  final Directory appDir = await getApplicationDocumentsDirectory(); // <- autorisé
-  final String savedDir = p.join(appDir.path, 'savedimg');
-  final String fileName = 'image_fixed_${DateTime.now().millisecondsSinceEpoch}.jpg';
-  final String savedPath = p.join(savedDir, fileName);
-
-  // 🔧 Créer le dossier s’il n’existe pas
-  await Directory(savedDir).create(recursive: true);
-
-  final savedFile = await File(fixedImage.path).copy(savedPath);
-
-  print('✅ Image enregistrée ici : $savedPath');
-
-  setState(() {
-    _image = savedFile;
-  });
-}
+  }
+  
 
 
- /* Future<void> _pickImageFromCamera() async {
+  Future<void> _pickImageFromCamera() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
     );
@@ -121,17 +103,10 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
         _image = File(pickedFile.path);
       });
     }
-  }*/
-  Future<void> _pickImageFromCamera() async {
-  final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-  if (pickedFile != null) {
-    final fixedImage = await FlutterExifRotation.rotateImage(path: pickedFile.path);
-    setState(() {
-      _image = fixedImage;
-    });
   }
-}
+  
 
+  
   Future<void> _analyserImage() async {
     if (_image == null) return;
     setState(() {
@@ -140,7 +115,7 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
     print("Analyse en cours avec les infos suivantes :");
     print("Âge : $_age");
     print("Genre : $_gender");
-    final uri = Uri.parse('http://192.168.1.37:5000/analyse');
+    final uri = Uri.parse('http://192.168.1.38:5000/analyse');
     var request =
         http.MultipartRequest('POST', uri)
           /*..fields['gender'] = 'homme'
@@ -150,12 +125,24 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
           ..files.add(await http.MultipartFile.fromPath('image', _image!.path));
 
     var response = await request.send();
-
+  
     if (response.statusCode == 200) {
       final responseBody = await response.stream.bytesToString();
       try {
         final jsonMap = json.decode(responseBody);
+        print("Réponse JSON : $jsonMap");
+ // Vérification : si les deux champs sont absents ou vides, on affiche une erreur
+        final isResultsEmpty = jsonMap['results'] == null || (jsonMap['results'] as List).isEmpty;
+         final isDataEmpty = jsonMap['data'] == null || (jsonMap['data'] as Map).isEmpty;
 
+        if (isResultsEmpty || isDataEmpty) {
+          _showError("Aucun résultat détecté. Veuillez réessayer avec une image plus lisible.");
+           setState(() {
+      _isLoading = false;
+       });
+          return;
+
+  }
         if (jsonMap['results'] != null && jsonMap['results'] is List) {
           final results = jsonMap['results'] as List;
           List<AnalyseResult> analyses =

@@ -2,191 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pfemaster/component/textformfield.dart';
+//import 'package:pfemaster/component/textformfield.dart';
 import 'dart:math';
 
-/*class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
-  List<DocumentSnapshot> data = [];
- String userId=FirebaseAuth.instance.currentUser!.uid;
-  getData() async {
-     DocumentSnapshot querySnapshot = await FirebaseFirestore.instance.collection("users").doc(userId).get();
-      data.add(querySnapshot); // Add DocumentSnapshot to the list
-      setState(() {
-        
-      });
-  }
-@override
-void initState() {
-  getData();
-  super.initState();
-  
-}
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () async{
-              GoogleSignIn googleSignIn = GoogleSignIn();
-              googleSignIn.disconnect();
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil("Login", (route) => false);
-            },
-          ),
-        ],
-        title: Text('Home Page'),
-      ),
-      body: ListView.builder(
-        itemCount: data.length,
-       itemBuilder: (context, index) {
-         return Card(
-          child:Column(
-            children: [
-            
-              Text("email: ${data[index]['email']}"),
-              Text("age: ${data[index]['age']}"),
-            ],
-          ),
-         );
-       }
-           /* FirebaseAuth.instance.currentUser!.emailVerified ? Text("welcome") 
-            : MaterialButton(
-              child: Text("please verify your email"),
-              color:Colors.blueAccent,
-              textColor: Colors.white,
-              onPressed: (){
-                FirebaseAuth.instance.currentUser!.sendEmailVerification().then((value) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("verification email sent")));
-                });
-              },
-
-             
-              ),*/
-         
-
-        
-      
-         
-      ),
-    );
-  }
-}*/
-
-//+===============================================//
-
-/*
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  
-  
-  User? user = FirebaseAuth.instance.currentUser;
-  DocumentSnapshot? userData;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchUserData();
-  }
-
-//pour afficher les données de l'utilisateur
-  Future<void> fetchUserData() async {
-    if (user != null) {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      setState(() {
-        userData = doc;
-      });
-    }
-  }
-
-// Fonction pour envoyer les données au backend (API Flask)
- 
-  @override
-  Widget build(BuildContext context) {
-    if (userData == null) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Color(0xFFF7FBFF),
-       appBar: AppBar(
-        backgroundColor: Color(0xFFF7FBFF),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () async{
-              GoogleSignIn googleSignIn = GoogleSignIn();
-              googleSignIn.disconnect();
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil("Login", (route) => false);
-            },
-          ),
-        ],),
-        
-          body: /*Container(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Text("Name: ${userData!['full name']}", style: TextStyle(fontSize: 18)),
-              Text("Email: ${userData!['email']}", style: TextStyle(fontSize: 18)),
-              Text("Date of Birth: ${userData!['birth date']}", style: TextStyle(fontSize: 18)),
-              Text("Gender: ${userData!['gender']}", style: TextStyle(fontSize: 18)),
-              Text("Age: ${userData!['age']}", style: TextStyle(fontSize: 18)),
-            ],
-          ),
-        ),
-
-        
-      ),*/
-      Container(
-        child:Column(
-          children :[
-            MaterialButton(
-              child: Text("get prédiction"),
-              color:Colors.blueAccent,
-              textColor: Colors.white,
-              onPressed: (){
-                Navigator.pushNamed(context, "formPrediction");
-              },
-
-             ),
-             SizedBox(height: 20),
-            
-          ],
-        ),
-      )
-
-        
-        );
-    
-  }}*/
-
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -210,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     fetchUserData();
-    _loadUserPhoto();
+   
     fetchPredictionStats();
     // fetchLastPrediction();
 
@@ -232,20 +50,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _loadUserPhoto() async {
-    if (user != null) {
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user!.uid)
-              .get();
-      if (doc.exists && doc.data() != null) {
-        setState(() {
-          photoUrl = doc.data()!['photoUrl'];
-        });
-      }
-    }
-  }
+
 
   Future<void> fetchPredictionStats() async {
     if (user != null) {
@@ -354,21 +159,13 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8),
-          child: CircleAvatar(
-            backgroundImage:
-                photoUrl != null
-                    ? NetworkImage(photoUrl!)
-                    : AssetImage("images/upload.png") as ImageProvider,
-          ),
-        ),
+        
         title: Text.rich(
           TextSpan(
             children: [
               TextSpan(
                 text: "Bonjour, ",
-                style: TextStyle(color: Colors.black, fontSize: 18),
+                style: TextStyle(color: Colors.black, fontSize: 20),
               ),
               TextSpan(
                 text: "$fullName 👋",
@@ -441,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             Navigator.pushNamed(context, "formPrediction");
                           },
-                          icon: Icon(Icons.analytics, size: 20),
+                          icon: Icon(Icons.analytics, color: Colors.white,size: 20),
                           label: Text(
                             "predict",
                             style: TextStyle(color: Colors.white, fontSize: 16),
@@ -494,7 +291,7 @@ class _HomePageState extends State<HomePage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 18),
+              SizedBox(height: 12),
 
               Padding(
                 padding: const EdgeInsets.all(12),
@@ -510,86 +307,61 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 6),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 2,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: _buildColoredStatCard(
-                              icon: Icons.analytics,
-                              label: "Total Prédictions",
-                              value: totalPredictions.toString(),
-                              color: Colors.blueAccent,
-                              withContainer:
-                                  false, // on ne met pas de container interne ici
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 6),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.redAccent.withOpacity(0.3),
-                                  spreadRadius: 2,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: _buildColoredStatCard(
-                              icon: Icons.warning,
-                              label: "Risque élevé",
-                              value: highRiskCount.toString(),
-                              color: Colors.redAccent,
-                              withContainer: false,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 6),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.green.withOpacity(0.3),
-                                  spreadRadius: 2,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: _buildColoredStatCard(
-                              icon: Icons.health_and_safety,
-                              label: "Risque faible",
-                              value: lowRiskCount.toString(),
-                              color: Colors.green,
-                              withContainer: false,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    IntrinsicHeight(
+  child: Row(
+    children: [
+      for (var stat in [
+        {
+          'icon': Icons.analytics,
+          'label': "Total Prédictions",
+          'value': totalPredictions.toString(),
+          'color': Colors.blueAccent
+        },
+        {
+          'icon': Icons.warning,
+          'label': "Risque élevé",
+          'value': highRiskCount.toString(),
+          'color': Colors.redAccent
+        },
+        {
+          'icon': Icons.health_and_safety,
+          'label': "Risque faible",
+          'value': lowRiskCount.toString(),
+          'color': Colors.green
+        },
+      ])
+        Expanded(
+          child: SizedBox(
+            height: 140,
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 6),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: _buildColoredStatCard(
+                icon: stat['icon'] as IconData,
+                label: stat['label'] as String,
+                value: stat['value'] as String,
+                color: stat['color'] as Color,
+                withContainer: false,
+              ),
+            ),
+          ),
+        ),
+    ],
+  ),
+),
+
                   ],
                 ),
               ),
@@ -709,12 +481,12 @@ class _HomePageState extends State<HomePage> {
     final cardContent = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 32, color: color),
+        Icon(icon, size: 20, color: color),
         SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: color,
           ),

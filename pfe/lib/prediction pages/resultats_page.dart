@@ -52,7 +52,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le temps de suivi';
+                      return 'Veuillez saisir le temps de suivi';
                     }
                     return null;
                   },
@@ -65,7 +65,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Annuler
               },
-              child: const Text('Annuler'),
+              child: const Text('Annuler',style: TextStyle(color: Colors.blue),),
             ),
             ElevatedButton(
               onPressed: () {
@@ -78,7 +78,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
                   _fairePrediction(context);
                 }
               },
-              child: const Text('Confirmer'),
+              child: const Text('Confirmer',style: TextStyle(color: Colors.blue),),
             ),
           ],
         );
@@ -180,7 +180,85 @@ class _ResultatsPageState extends State<ResultatsPage> {
     await sendToFlaskAPI(data, context);
   }
 
-  void showPredictionResultat(
+
+  void showPredictionResultat(BuildContext context, int prediction) {
+  String message = prediction == 1
+      ? "⚠️ Risque élevé détecté.\nMerci de consulter un médecin."
+      : "✅ Aucun risque détecté.\nContinuez à suivre un mode de vie sain.";
+
+  showModalBottomSheet(
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 5,
+            color: prediction == 1 ? Colors.red[50] : Colors.green[50],
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Text(
+                    "Résultat de la prédiction",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: prediction == 1 ? Colors.red : Colors.green,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    message,
+                    style: TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                child: Text("Fermer", style: TextStyle(color:Color(0xFF4A90E2)),),
+                onPressed: () {Navigator.pop(context);
+                }
+              ),
+              ElevatedButton(
+                style:ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF4A90E2),
+                  shape: StadiumBorder(),
+                ),
+                 onPressed: () async {
+                          await savePredictionToFirestore(prediction);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Prédiction sauvegardée avec succès',
+                              ),
+                            ),
+                          );
+                        },
+                child: Text("Sauvegarder",style:TextStyle(color:Colors.white)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+ /* void showPredictionResultat(
     BuildContext context,
     String message,
     int prediction,
@@ -270,9 +348,10 @@ class _ResultatsPageState extends State<ResultatsPage> {
           ),
     );
   }
-
+*/
   Future<void> savePredictionToFirestore(int prediction) async {
     final user = FirebaseAuth.instance.currentUser;
+    final r = widget.resultats2[0];
     if (user == null) {
       print("Utilisateur non connecté");
       return;
@@ -285,8 +364,21 @@ class _ResultatsPageState extends State<ResultatsPage> {
           .collection('predictions')
           .add({
             'uid': user.uid,
+            'age': r.age ?? 0,
+            'sex': r.sex ?? 0,
             'result': prediction == 1 ? "Risque élevé" : "Pas de risque",
-            'timestamp': FieldValue.serverTimestamp(),
+            'Date': FieldValue.serverTimestamp(),
+            "Fraction d’éjection": widget.resultats2[0].ejectionFraction,
+            "serum_creatinine": widget.resultats2[0].serumCreatinine,
+            'time': widget.resultats2[0].time,
+            'anaemia': r.anaemia ?? 0,
+            'creatinine_phosphokinase': r.creatininePhosphokinase ?? 0.0,
+            'diabetes': r.diabetes ?? 0,
+            
+            'high_blood_pressure': r.highBloodPressure ?? 0,
+            'platelets': r.platelets ?? 0,
+            'serum_sodium': r.serumSodium ?? 0.0,
+            
           });
       print("Prédiction sauvegardée avec succès");
     } catch (e) {
@@ -301,7 +393,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
   ) async {
     try {
       Uri apiUrl = Uri.parse(
-        'http://192.168.100.13:5000/predict',
+        'http://192.168.1.38:5000/prediction_img',
       ); // Remplace par ton URL Flask si nécessaire
 
       final response = await http.post(
@@ -314,12 +406,9 @@ class _ResultatsPageState extends State<ResultatsPage> {
         final data = json.decode(response.body);
         int result = data['prediction'];
 
-        String predictionResult =
-            result == 1
-                ? "⚠️ Risque élevé détecté.\nMerci de consulter un médecin."
-                : "✅ Aucun risque détecté.\nContinuez à suivre un mode de vie sain.";
+        
 
-        showPredictionResultat(context, predictionResult, result);
+        showPredictionResultat(context, result);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur lors de la prédiction.')),
@@ -341,11 +430,16 @@ class _ResultatsPageState extends State<ResultatsPage> {
         widget.resultats2[0].serumCreatinine != null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Résultats d'analyses")),
+       backgroundColor: Color(0xFFF7FBFF),
+      appBar: AppBar(
+        title: const Text("Résultats d'analyses"),
+          backgroundColor: Colors.white,
+        ),
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.white,
         onPressed: () => _sauvegarderTout(context),
-        icon: const Icon(Icons.save),
-        label: const Text("Sauvegarder"),
+        icon: const Icon(Icons.save,color:Colors.blue),
+        label: const Text("Sauvegarder", style: TextStyle(color: Colors.blue)),
       ),
       body: ListView.builder(
         itemCount: widget.resultats.length + (afficherBoutonPrediction ? 1 : 0),
@@ -357,7 +451,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
 
             switch (r.interpretation) {
               case 'normal':
-                color = Colors.yellow;
+                color = Colors.green;
                 // interpretationText = "Le résultat est au rendez-vous";
                 break;
               case 'bad':
@@ -371,6 +465,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
             }
 
             return Card(
+                color: Colors.white,
               margin: const EdgeInsets.all(12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -422,21 +517,36 @@ class _ResultatsPageState extends State<ResultatsPage> {
                     ),*/
                   ],
                 ),
+                 
               ),
+              
             );
           } else {
+            
             return Padding(
+              
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  _demanderTimeEtPredire(context);
-                  afficherPredictionData();
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: const Text("FAIRE PRÉDICTION"),
-              ),
+             child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        
+        ElevatedButton(
+          onPressed: () {
+            _demanderTimeEtPredire(context);
+            afficherPredictionData();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            minimumSize: const Size.fromHeight(50),
+          ),
+          child: const Text(
+            "FAIRE PRÉDICTION",
+            style: TextStyle(color: Colors.blue),
+          ),
+        ),
+        SizedBox(height: 80),
+      ],
+    ),
             );
           }
         },

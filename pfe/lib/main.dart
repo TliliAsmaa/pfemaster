@@ -14,7 +14,8 @@ import 'package:pfemaster/modifieprofile.dart';
 
 
 import 'package:pfemaster/prediction%20pages/formPrediction.dart';
-import 'package:pfemaster/prediction%20pages/imagePrediction';
+
+import 'package:pfemaster/prediction%20pages/imagePrediction.dart';
 void main() async{
   
    

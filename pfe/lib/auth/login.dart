@@ -81,7 +81,7 @@ Future signInWithGoogle() async {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height:80,),
+                Container(height:50,),
                 LogoAuth(),
                 Container(height:20),
                   Text("Se connecter",style:TextStyle(fontSize: 30,fontWeight: FontWeight.bold)),
