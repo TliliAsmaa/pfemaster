@@ -86,17 +86,34 @@ Ta mission :
 5. Si l'unité extraite ne correspond pas à celle de mon dataset, convertis la valeur dans l'unité attendue. Les unités attendues sont les suivantes :
 
 age : années (ans)
-anaemia : pas d'unité (valeur binaire)
-creatinine_phosphokinase : UI/L (Unité Internationale par litre)
-diabetes : pas d'unité (valeur binaire)
-ejection_fraction : pourcentage (%)
-high_blood_pressure : pas d'unité (valeur binaire)
-platelets : cellules/µL (plaquettes par microlitre)
-serum_creatinine : mg/dL (milligrammes par décilitre)
-serum_sodium : mEq/L (milléquivalents par litre)
-sex : pas d'unité (valeur binaire)
-smoking : pas d'unité (valeur binaire)
-time : mois
+- anaemia : valeur binaire (1 = anémie, 0 = normal)
+- creatinine_phosphokinase : doit être en UI/L
+    - Si la valeur est en mcg/L, convertir en UI/L :
+      - Conversion : 1 UI/L ≈ 1.67 mcg/L
+      - Donc, UI/L = mcg/L ÷ 1.67
+- diabetes : valeur binaire (1 = oui, 0 = non)
+- ejection_fraction : en pourcentage (%)
+    - Si exprimé en fraction (ex: 0.55), le multiplier par 100
+- high_blood_pressure : valeur binaire (1 = oui, 0 = non)
+- platelets : doit être en cellules/µL
+    - Si exprimé en "10^3/mm^3", "10*3/mm*3", ou équivalent :
+      - 1 mm³ = 1 µL
+      - Donc, multiplier la valeur par 1000
+      - Ex : 312.0 10*3/mm*3 → 312000 cellules/µL
+    - Si exprimé en "kiloplatelets/mL" :
+        - 1 kiloplatelet = 1000 cellules
+        - 1 mL = 1000 µL → donc 1 kiloplatelets/mL = 1 cellule/µL × 1000
+        - Donc, multiplier la valeur par **1000**
+        - Exemple : 250.3 kiloplatelets/mL → 250300 cellules/µL
+- serum_creatinine : en mg/dL
+    - Si valeur exprimée en µmol/L, convertir :
+      - 1 mg/dL = 88.4 µmol/L
+      - Donc, mg/dL = µmol/L ÷ 88.4
+- serum_sodium : en mEq/L
+- sex : valeur binaire (1 = homme, 0 = femme)
+- smoking : valeur binaire (1 = oui, 0 = non)
+- time : en mois
+
 Règles de remplissage :
 
 1. **Hématologie (NFS - Numération Formule Sanguine)** :
