@@ -6,6 +6,7 @@ import ocr_preprocess
 import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
+import platform
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
