@@ -21,7 +21,8 @@ WORKDIR /app
 COPY . /app
 
 # Installer les dépendances Python (depuis le bon chemin)
-RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
+#RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Exposer le port utilisé par Flask
 EXPOSE 5000
