@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copier les fichiers du backend
-COPY back-end /app/back-end
+#COPY back-end /app/back-end
+COPY . /app
 
 # Installer les dépendances Python (depuis le bon chemin)
 RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
