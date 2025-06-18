@@ -173,7 +173,7 @@ logger = logging.getLogger(__name__)
 
 # ✅ Vérifie si un mot est valide (lettres/chiffres, au moins 2 caractères)
 def is_valid_word(word):
-    return re.fullmatch(r"[A-Za-z0-9éèàâêîôûçÉÈÀÂÊÎÔÛÇ'-]{2,}", word) is not None
+    return re.fullmatch(r"[A-Za-z0-9éèàâêîôûçÉÈÀÂÊÎÔÛÇ'-]{3,}", word) is not None
 
 # 📚 Charge les dictionnaires (dict.txt et MedicalTerms.json)
 def load_french_dictionary(txt_path="dict.txt", json_path="MedicalTerms.json"):
