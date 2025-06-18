@@ -62,13 +62,14 @@ Je te fournis un texte brut OCR contenant des résultats d’analyses médicales
 Voici le texte brut :
 {message}
 
-
+-
 Informations supplémentaires :
 - Le sexe du patient est déjà connu : - Sexe: {sex_num}
 - L'âge du patient est déjà connu : - Âge: {age} ans.
 - Fumeur: {smoking_num}.
 Ta mission :
-
+0. Extrais uniquement les résultats d’analyses médicales pertinentes du texte brut.
+   -si le texte est vide ou illisible ne renvoie pas des analyses qui n'ont pas de sens.
 1. Ignore tout le texte qui n’est pas une analyse médicale (exemple : nom du labo, informations patient, date, etc.).
 2. Associe chaque nom d’analyse à sa valeur correspondante même si le format est perturbé.
 3. Pour chaque test médical identifié :
