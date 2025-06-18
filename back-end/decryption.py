@@ -7,6 +7,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
 import platform
+import pytesseract
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
