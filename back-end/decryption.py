@@ -6,14 +6,11 @@ import ocr_preprocess
 import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
-import platform
-import pytesseract
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.info(f"📌 Système d'exécution : {platform.system()} {platform.release()}")
-logger.info(f"📌 Tesseract utilisé : {pytesseract.get_tesseract_version()}")
-logger.info("🚀 OCR en cours dans Railway via decryption.py")
+
 
 load_dotenv()
 
