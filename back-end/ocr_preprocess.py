@@ -232,15 +232,15 @@ def try_rotations(image, valid_word_set):
         words = text.split()
         valid_words = [w for w in words if is_valid_word(w) and w.lower() in valid_word_set]
 
-        logger.info(f"🔄 Angle {angle}° : {len(valid_words)} mots valides détectés")
-        logger.info(f"Mots : {valid_words}")
+        logger.info(f"🔄 Angle {angle}° : {len(valid_words)} mots valides détectés",flush=True)
+        logger.info(f"Mots : {valid_words}",flush=True)
 
         if len(valid_words) > max_words:
             max_words = len(valid_words)
             best_img = rotated
             best_angle = angle
 
-    logger.info(f"✅ Meilleure rotation : {best_angle}°, avec {max_words} mots valides")
+    logger.info(f"✅ Meilleure rotation : {best_angle}°, avec {max_words} mots valides",flush=True)
     return best_img
 
 # 📐 Détection et correction de l'inclinaison
@@ -309,7 +309,7 @@ def getmessage(imagefile, debug_mode=True):
             save_image(thresholded, "6. Thresholded.png")"""
 
         text = pytesseract.image_to_string(thresholded, lang="fra", config='--oem 3 --psm 6')
-        logger.info("OCR terminé.")
+        logger.info("OCR terminé.",flush=True)
         return text.strip()
 
     except Exception as e:
