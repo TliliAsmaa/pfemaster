@@ -107,6 +107,8 @@ def prediction_img():
 @app.route('/analyse', methods=['POST'])
 def analyse():
     try:
+        print("📝 Formulaire reçu :", request.form)
+        print("🖼️ Fichiers reçus :", request.files)
         # 1. Vérification du fichier image
         if 'image' not in request.files:
             logger.error("Aucun fichier image reçu")
