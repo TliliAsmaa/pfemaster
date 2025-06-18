@@ -37,7 +37,7 @@ logger.info(f"Décryptage de l'image : {image_path}, gender={gender}, age={age},
 
 message = ocr_preprocess.getmessage(image_path)
 #logger.info(f"Texte OCR extrait : {message}")
-#print("text",message)
+print("text",message)
 message = message.replace('\n', ' ')
 message = re.sub(r'\d{2}-\d{2}-\d{2,4}', '', message)
 if not message.strip():
