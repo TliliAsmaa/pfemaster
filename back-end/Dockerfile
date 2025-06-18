@@ -1,7 +1,7 @@
-# On part d'une image Python légère officielle
+# Image légère avec Python
 FROM python:3.11-slim
 
-# Installer Tesseract et les librairies système nécessaires
+# Installer Tesseract OCR + langue française + dépendances
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-fra \
@@ -10,21 +10,19 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxext6 \
     libgl1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Définir le dossier de travail dans le container
+# Créer un dossier de travail
 WORKDIR /app
 
-# Copier les fichiers du backend
-COPY back-end /app/back-end
+# Copier tout le projet dans le conteneur
+COPY . .
 
-# Installer les dépendances Python (depuis le bon chemin)
-RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Exposer le port utilisé par Flask
+# Définir la commande par défaut (ici Flask ou Gunicorn)
+CMD ["python", "app.py"]
+
+# Exposer le port Flask
 EXPOSE 5000
-
-# Commande pour lancer l'application
-CMD ["python", "back-end/app.py"]
-
