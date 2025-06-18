@@ -298,7 +298,7 @@ def getmessage(imagefile, debug_mode=True):
         """if debug_mode:
             save_image(deskewed, "4. Deskewed.png")"""
 
-        resized = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+        resized = cv2.resize(rotated, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
         """if debug_mode:
             save_image(resized, "5. Resized.png")"""
 
