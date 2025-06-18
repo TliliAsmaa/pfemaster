@@ -132,6 +132,9 @@ def analyse():
             [sys.executable, 'decryption.py', save_path, gender, age, smoking],
             capture_output=True, text=True, timeout=300
         )
+        print("🔧 stdout:", result.stdout)
+        print("❌ stderr:", result.stderr)
+
 
         if result.returncode != 0:
             print("Erreur script Python :", result.stderr)
@@ -208,7 +211,7 @@ def analyse():
         return jsonify({'error': 'Erreur interne', 'details': str(e)}), 500
     """
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
 
 
