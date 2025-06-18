@@ -173,7 +173,8 @@ logger = logging.getLogger(__name__)
 
 # ✅ Vérifie si un mot est valide (lettres/chiffres, au moins 2 caractères)
 def is_valid_word(word):
-    return re.fullmatch(r"[A-Za-z0-9éèàâêîôûçÉÈÀÂÊÎÔÛÇ'-]{3,}", word) is not None
+   # return re.fullmatch(r"[A-Za-z0-9éèàâêîôûçÉÈÀÂÊÎÔÛÇ'-]{3,}", word) is not None
+    return re.fullmatch(r"[A-Za-z0-9éèàâêîôûçÉÈÀÂÊÎÔÛÇ'’.,/%-]{3,}", word) is not None
 
 # 📚 Charge les dictionnaires (dict.txt et MedicalTerms.json)
 def load_french_dictionary(txt_path="dict.txt", json_path="MedicalTerms.json"):
@@ -230,7 +231,10 @@ def try_rotations(image, valid_word_set):
         rotated = rotate_image(image, angle)
         text = pytesseract.image_to_string(rotated, lang='fra', config='--oem 3 --psm 6')
         words = text.split()
-        valid_words = [w for w in words if is_valid_word(w) and w.lower() in valid_word_set]
+        valid_words = [
+            #w for w in words if is_valid_word(w) and w.lower() in valid_word_set
+              w for w in words if is_valid_word(w) and (w.lower() in valid_word_set or re.fullmatch(r"\d+([.,]\d+)?([/%])?", w))
+            ]
 
         logger.info(f"🔄 Angle {angle}° : {len(valid_words)} mots valides détectés")
         logger.info(f"Mots : {valid_words}")
