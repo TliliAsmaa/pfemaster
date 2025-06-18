@@ -18,15 +18,15 @@ WORKDIR /app
 
 # Copier les fichiers du backend
 #COPY back-end /app/back-end
-COPY . /app
+COPY . .
 
 # Installer les dépendances Python (depuis le bon chemin)
 #RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Exposer le port utilisé par Flask
 EXPOSE 5000
 
 # Commande pour lancer l'application
-CMD ["python", "back-end/app.py"]
+CMD ["python", "app.py"]
 
