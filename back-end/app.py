@@ -132,6 +132,9 @@ def analyse():
             [sys.executable, 'decryption.py', save_path, gender, age, smoking],
             capture_output=True, text=True, timeout=300
         )
+        print("🔧 stdout:", result.stdout)
+        print("❌ stderr:", result.stderr)
+
 
         if result.returncode != 0:
             print("Erreur script Python :", result.stderr)
