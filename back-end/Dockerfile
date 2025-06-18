@@ -23,12 +23,12 @@ COPY . .
 #RUN pip install --no-cache-dir -r /app/back-end/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Définir la commande par défaut (ici Flask ou Gunicorn)
-CMD ["python", "app.py"]
 
 # Exposer le port Flask
 EXPOSE 5000
 
 # Commande pour lancer l'application
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
 
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--timeout", "300", "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-", "app:app"]
