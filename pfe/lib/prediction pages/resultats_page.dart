@@ -28,9 +28,12 @@ class _ResultatsPageState extends State<ResultatsPage> {
     final TextEditingController followUpTimeController =
         TextEditingController();
 
+    // Use the context from the Scaffold (passed from build method)
+    final scaffoldContext = context;
+
     await showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text("Information requise"),
           content: Form(
@@ -61,25 +64,22 @@ class _ResultatsPageState extends State<ResultatsPage> {
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Annuler
-              },
-              child: const Text('Annuler',style: TextStyle(color: Colors.blue),),
-            ),
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
+                  final time = followUpTimeController.text.trim();
+                  Navigator.of(dialogContext).pop(); // Close the dialog
                   setState(() {
-                    prediction_data['time'] =
-                        followUpTimeController.text.trim();
+                    prediction_data['time'] = time;
                   });
-                  Navigator.of(context).pop();
-                  _fairePrediction(context);
-                  
+                  // Use scaffoldContext instead of dialogContext
+                  _fairePrediction(scaffoldContext);
                 }
               },
-              child: const Text('Confirmer',style: TextStyle(color: Colors.blue),),
+              child: const Text(
+                'Confirmer',
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ],
         );
@@ -163,96 +163,115 @@ class _ResultatsPageState extends State<ResultatsPage> {
 
     final data = {
       'age': r.age ?? 0,
-     
+      'anaemia': r.anaemia ?? 0,
+      'creatinine_phosphokinase': r.creatininePhosphokinase ?? 0.0,
+      'diabetes': r.diabetes ?? 0,
       'ejection_fraction': r.ejectionFraction ?? 0.0,
-      
+      'high_blood_pressure': r.highBloodPressure ?? 0,
+      'platelets': r.platelets ?? 0,
       'serum_creatinine': r.serumCreatinine ?? 0.0,
-     
-      'time': prediction_data['time'] ,
+      'serum_sodium': r.serumSodium ?? 0.0,
+      'sex': r.sex ?? 0,
+      'smoking': r.smoking ?? 0,
+      'time': prediction_data['time'] ?? r.time ?? 0,
     };
     print(
-      "🕒 Temps utilisé pour la prédiction : ${prediction_data['time'] }",
+      "🕒 Temps utilisé pour la prédiction : ${prediction_data['time'] ?? r.time ?? 0}",
     );
-     print("✅ Données envoyées à l'API : $data");
-    await sendToFlaskAPI(data, context);
+
+    final prediction = await sendToFlaskAPI(data, context);
+    if (prediction != null && mounted) {
+      showPredictionResultat(context, prediction);
+    }
   }
 
-
   void showPredictionResultat(BuildContext context, int prediction) {
-  String message = prediction == 1
-      ? "⚠️ Risque élevé détecté.\nMerci de consulter un médecin."
-      : "✅ Aucun risque détecté.\nContinuez à suivre un mode de vie sain.";
+    String message =
+        prediction == 1
+            ? "⚠️ Risque élevé détecté.\nMerci de consulter un médecin."
+            : "✅ Aucun risque détecté.\nContinuez à suivre un mode de vie sain.";
 
-  showModalBottomSheet(
-    context: context,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) => Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 5,
-            color: prediction == 1 ? Colors.red[50] : Colors.green[50],
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text(
-                    "Résultat de la prédiction",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: prediction == 1 ? Colors.red : Colors.green,
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 5,
+                  color: prediction == 1 ? Colors.red[50] : Colors.green[50],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Résultat de la prédiction",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: prediction == 1 ? Colors.red : Colors.green,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          message,
+                          style: TextStyle(fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 12),
-                  Text(
-                    message,
-                    style: TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text(
+                        "Fermer",
+                        style: TextStyle(color: Color(0xFF4A90E2)),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF4A90E2),
+                        shape: StadiumBorder(),
+                      ),
+                      onPressed: () async {
+                        await savePredictionToFirestore(prediction);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Prédiction sauvegardée avec succès'),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Sauvegarder",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                child: Text("Fermer", style: TextStyle(color:Color(0xFF4A90E2)),),
-                onPressed: () {Navigator.pop(context);
-                }
-              ),
-              ElevatedButton(
-                style:ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF4A90E2),
-                  shape: StadiumBorder(),
-                ),
-                 onPressed: () async {
-                          await savePredictionToFirestore(prediction);
-                         if (!mounted) return;
-ScaffoldMessenger.of(context).showSnackBar(
-  const SnackBar(content: Text('Prédiction sauvegardée avec succès')),
-);
-Navigator.pop(context);
-                        },
-                child: Text("Sauvegarder",style:TextStyle(color:Colors.white)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
- /* void showPredictionResultat(
+    );
+  }
+
+  /* void showPredictionResultat(
     BuildContext context,
     String message,
     int prediction,
@@ -368,11 +387,10 @@ Navigator.pop(context);
             'anaemia': r.anaemia ?? 0,
             'creatinine_phosphokinase': r.creatininePhosphokinase ?? 0.0,
             'diabetes': r.diabetes ?? 0,
-            
+
             'high_blood_pressure': r.highBloodPressure ?? 0,
             'platelets': r.platelets ?? 0,
             'serum_sodium': r.serumSodium ?? 0.0,
-            
           });
       print("Prédiction sauvegardée avec succès");
     } catch (e) {
@@ -381,44 +399,45 @@ Navigator.pop(context);
   }
 
   // Envoi des données à l'API Flask pour la prédiction
-  Future<void> sendToFlaskAPI(
+  Future<int?> sendToFlaskAPI(
     Map<String, dynamic> formData,
     BuildContext context,
   ) async {
     try {
-      Uri apiUrl = Uri.parse(
-        'https://pfemaster-production.up.railway.app//prediction_img',
-      ); // Remplace par ton URL Flask si nécessaire
-
       final response = await http.post(
-        apiUrl,
+        Uri.parse('https://web-production-f3dc.up.railway.app/prediction_img'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(formData),
       );
-      if (!context.mounted) return;
+
+      if (!mounted) return null;
+
+      final decoded = json.decode(response.body);
+      print("✅ Réponse brute de l'API : ${response.body}");
+      print("✅ Données décodées : $decoded");
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        int result = data['prediction'];
-
-        print(
-          "✅ Résultat de la prédiction : $result",
-        );
-
-        showPredictionResultat(context, result);
-        
+        if (decoded.containsKey('prediction')) {
+          return decoded['prediction'];
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Erreur : clé 'prediction' absente.")),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erreur lors de la prédiction.')),
+          SnackBar(content: Text("Erreur HTTP : ${response.statusCode}")),
         );
       }
     } catch (e) {
-      print('Erreur lors de l\'envoi à l\'API: $e');
-    if (!context.mounted) return;
-
-     ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(content: Text('Erreur de connexion.')),
-);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Erreur lors de la connexion à l'API")),
+        );
+      }
+      print("❌ Exception : $e");
     }
+    return null;
   }
 
   @override
@@ -429,15 +448,15 @@ Navigator.pop(context);
         widget.resultats2[0].serumCreatinine != null;
 
     return Scaffold(
-       backgroundColor: Color(0xFFF7FBFF),
+      backgroundColor: Color(0xFFF7FBFF),
       appBar: AppBar(
         title: const Text("Résultats d'analyses"),
-          backgroundColor: Colors.white,
-        ),
+        backgroundColor: Colors.white,
+      ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Colors.white,
         onPressed: () => _sauvegarderTout(context),
-        icon: const Icon(Icons.save,color:Colors.blue),
+        icon: const Icon(Icons.save, color: Colors.blue),
         label: const Text("Sauvegarder", style: TextStyle(color: Colors.blue)),
       ),
       body: ListView.builder(
@@ -464,7 +483,7 @@ Navigator.pop(context);
             }
 
             return Card(
-                color: Colors.white,
+              color: Colors.white,
               margin: const EdgeInsets.all(12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -516,36 +535,31 @@ Navigator.pop(context);
                     ),*/
                   ],
                 ),
-                 
               ),
-              
             );
           } else {
-            
             return Padding(
-              
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-             child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        
-        ElevatedButton(
-          onPressed: () {
-            _demanderTimeEtPredire(context);
-            afficherPredictionData();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            minimumSize: const Size.fromHeight(50),
-          ),
-          child: const Text(
-            "FAIRE PRÉDICTION",
-            style: TextStyle(color: Colors.blue),
-          ),
-        ),
-        SizedBox(height: 80),
-      ],
-    ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _demanderTimeEtPredire(context);
+                      afficherPredictionData();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(50),
+                    ),
+                    child: const Text(
+                      "FAIRE PRÉDICTION",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                  SizedBox(height: 80),
+                ],
+              ),
             );
           }
         },
