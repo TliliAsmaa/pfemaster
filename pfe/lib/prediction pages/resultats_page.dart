@@ -76,6 +76,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
                   });
                   Navigator.of(context).pop();
                   _fairePrediction(context);
+                  
                 }
               },
               child: const Text('Confirmer',style: TextStyle(color: Colors.blue),),
@@ -162,21 +163,17 @@ class _ResultatsPageState extends State<ResultatsPage> {
 
     final data = {
       'age': r.age ?? 0,
-      'anaemia': r.anaemia ?? 0,
-      'creatinine_phosphokinase': r.creatininePhosphokinase ?? 0.0,
-      'diabetes': r.diabetes ?? 0,
+     
       'ejection_fraction': r.ejectionFraction ?? 0.0,
-      'high_blood_pressure': r.highBloodPressure ?? 0,
-      'platelets': r.platelets ?? 0,
+      
       'serum_creatinine': r.serumCreatinine ?? 0.0,
-      'serum_sodium': r.serumSodium ?? 0.0,
-      'sex': r.sex ?? 0,
-      'smoking': r.smoking ?? 0,
-      'time': prediction_data['time'] ?? r.time ?? 0,
+     
+      'time': prediction_data['time'] ,
     };
     print(
-      "🕒 Temps utilisé pour la prédiction : ${prediction_data['time'] ?? r.time ?? 0}",
+      "🕒 Temps utilisé pour la prédiction : ${prediction_data['time'] }",
     );
+     print("✅ Données envoyées à l'API : $data");
     await sendToFlaskAPI(data, context);
   }
 
@@ -240,14 +237,11 @@ class _ResultatsPageState extends State<ResultatsPage> {
                 ),
                  onPressed: () async {
                           await savePredictionToFirestore(prediction);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Prédiction sauvegardée avec succès',
-                              ),
-                            ),
-                          );
+                         if (!mounted) return;
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(content: Text('Prédiction sauvegardée avec succès')),
+);
+Navigator.pop(context);
                         },
                 child: Text("Sauvegarder",style:TextStyle(color:Colors.white)),
               ),
@@ -393,7 +387,7 @@ class _ResultatsPageState extends State<ResultatsPage> {
   ) async {
     try {
       Uri apiUrl = Uri.parse(
-        'http://192.168.1.38:5000/prediction_img',
+        'https://pfemaster-production.up.railway.app//prediction_img',
       ); // Remplace par ton URL Flask si nécessaire
 
       final response = await http.post(
@@ -401,14 +395,17 @@ class _ResultatsPageState extends State<ResultatsPage> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(formData),
       );
-
+      if (!context.mounted) return;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         int result = data['prediction'];
 
-        
+        print(
+          "✅ Résultat de la prédiction : $result",
+        );
 
         showPredictionResultat(context, result);
+        
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur lors de la prédiction.')),
@@ -416,9 +413,11 @@ class _ResultatsPageState extends State<ResultatsPage> {
       }
     } catch (e) {
       print('Erreur lors de l\'envoi à l\'API: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Erreur de connexion.')));
+    if (!context.mounted) return;
+
+     ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(content: Text('Erreur de connexion.')),
+);
     }
   }
 

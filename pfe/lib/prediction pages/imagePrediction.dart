@@ -115,13 +115,14 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
     print("Analyse en cours avec les infos suivantes :");
     print("Âge : $_age");
     print("Genre : $_gender");
-    final uri = Uri.parse('http://192.168.1.38:5000/analyse');
+    final uri = Uri.parse('https://pfemaster-production.up.railway.app/analyse');
     var request =
         http.MultipartRequest('POST', uri)
           /*..fields['gender'] = 'homme'
           ..fields['age'] = '30'*/
           ..fields['gender'] = _gender!
           ..fields['age'] = _age.toString()
+          ..fields['smoking'] = 'oui'
           ..files.add(await http.MultipartFile.fromPath('image', _image!.path));
 
     var response = await request.send();

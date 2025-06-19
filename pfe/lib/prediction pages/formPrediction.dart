@@ -115,7 +115,7 @@ Future<void> sendToFlaskAPI(Map<String, dynamic> formData) async {
 
   try {
     // URL de ton API Flask (remplace par l'URL réelle de ton API)
-    Uri apiUrl = Uri.parse('http://192.168.1.38:5000/predict'); // Remplace par l'URL de ton API
+    Uri apiUrl = Uri.parse('https://pfemaster-production.up.railway.app//predict'); // Remplace par l'URL de ton API
 
     // Effectuer la requête POST avec les données en format JSON
     final response = await http.post(

@@ -73,26 +73,26 @@ def predict():
 def prediction_img():
     try:
         data = request.get_json()
-
+        logger.info(f"Requête reçue pour /prediction_img : {data}")
         # Extraction des 4 caractéristiques utilisées dans le modèle
         age = float(data['age'])
         ejection_fraction = float(data['ejection_fraction'])
         serum_creatinine = float(data['serum_creatinine'])
         time = float(data['time'])
-
+        logger.info(f"Valeurs extraites : age={age}, ejection_fraction={ejection_fraction}, serum_creatinine={serum_creatinine}, time={time}")
         # Créer un tableau avec les 4 features dans le bon ordre
         input_data = np.array([[age, ejection_fraction, serum_creatinine, time]])
 
 
-
+        logger.info(f"Input data pour PCA : {input_data}")
         # Appliquer le PCA sur les données
         input_pca = pcaa.transform(input_data)
-
+       
         # Prédire avec le modèle
         prediction = modell.predict(input_pca)
-
+        logger.info(f"Prédiction effectuée : {prediction[0]}")
         return jsonify({'prediction': int(prediction[0])})
-
+        
     except Exception as e:
         logger.error(f"Erreur lors de la prédiction : {e}")
         return jsonify({'error': str(e)})
