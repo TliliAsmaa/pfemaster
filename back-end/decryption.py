@@ -91,24 +91,24 @@ Ta mission :
 
 age : années (ans)
 - anaemia : valeur binaire (1 = anémie, 0 = normal)
-- creatinine_phosphokinase : doit être en UI/L
-    - Si la valeur est en mcg/L, convertir en UI/L :
+- creatinine_phosphokinase : doit être en mcg/L
+    - Si la valeur est en UI/L , convertir en mcg/L :
       - Conversion : 1 UI/L ≈ 1.67 mcg/L
-      - Donc, UI/L = mcg/L ÷ 1.67
+      
 - diabetes : valeur binaire (1 = oui, 0 = non)
 - ejection_fraction : en pourcentage (%)
     - Si exprimé en fraction (ex: 0.55), le multiplier par 100
 - high_blood_pressure : valeur binaire (1 = oui, 0 = non)
-- platelets : doit être en cellules/µL
+- platelets : doit être en kiloplatelets/mL
     - Si exprimé en "10^3/mm^3", "10*3/mm*3", ou équivalent :
-      - 1 mm³ = 1 µL
-      - Donc, multiplier la valeur par 1000
-      - Ex : 312.0 10*3/mm*3 → 312000 cellules/µL
-    - Si exprimé en "kiloplatelets/mL" :
-        - 1 kiloplatelet = 1000 cellules
-        - 1 mL = 1000 µL → donc 1 kiloplatelets/mL = 1 cellule/µL × 1000
-        - Donc, multiplier la valeur par **1000**
-        - Exemple : 250.3 kiloplatelets/mL → 250300 cellules/µL
+      - 1 mm³ = 1 µL, et 1 kiloplatelet = 1000 cellules
+      -Donc : 1 10^3/mm^3 = 1000 cellules/µL = 1 kiloplatelet/µL
+      -Et comme 1 mL = 1000 µL → Diviser la valeur par 1000
+      - Ex : 312.0 10*3/mm*3 → 312000 cellules/µL → 312 kiloplatelets/mL
+    - Si exprimé en "cellules/µL" :
+        - 1000 cellules = 1 kiloplatelet
+        - Donc, diviser la valeur par 1000
+        - Exemple : 250000 cellules/µL → 250 kiloplatelets/mL
 - serum_creatinine : en mg/dL
     - Si valeur exprimée en µmol/L, convertir :
       - 1 mg/dL = 88.4 µmol/L
@@ -116,7 +116,7 @@ age : années (ans)
 - serum_sodium : en mEq/L
 - sex : valeur binaire (1 = homme, 0 = femme)
 - smoking : valeur binaire (1 = oui, 0 = non)
-- time : en mois
+- time : en jours
 
 Règles de remplissage :
 
