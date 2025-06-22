@@ -427,6 +427,10 @@ Future<void> savePredictionToFirestore(int prediction) async {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer la créatinine';
                     }
+                    final val = double.tryParse(value);
+  if (val == null || val < 23 || val > 7861) {
+    return "La valeur doit être comprise entre 23 et 7861 mcg/L";
+  }
                     return null;
                   },
                 ),
@@ -438,12 +442,16 @@ Future<void> savePredictionToFirestore(int prediction) async {
                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           keyboardType: TextInputType.number,
                   mycontroller: ejectionFractionController,
-                 hinttext: ( 'Fraction d\'éjection'),
+                 hinttext: ( 'Fraction d\'éjection (%)'),
                  
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer la fraction d\'éjection';
                     }
+                     final val = int.tryParse(value);
+  if (val == null || val < 14 || val > 80) {
+    return "Fraction d'éjection entre 14% et 80%";
+  }
                     return null;
                   },
                 ),
@@ -461,6 +469,10 @@ Future<void> savePredictionToFirestore(int prediction) async {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer les plaquettes';
                     }
+                     final val = double.tryParse(value);
+  if (val == null || val < 25100 || val > 850000) {
+    return "Valeur attendue entre 25 100 et 850 000 k/mL";
+  }
                     return null;
                   },
                 ),
@@ -469,6 +481,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
                  Text("Sérum Créatinine", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                 CustomTextFormField(
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
                   mycontroller: serumCreatinineController,
                  hinttext: ('Sérum Créatinine (mg/dL)'),
                  
@@ -478,6 +491,10 @@ Future<void> savePredictionToFirestore(int prediction) async {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer le sérum créatinine';
                     }
+                     final val = double.tryParse(value);
+  if (val == null || val < 0.5 || val > 9.4) {
+    return "Valeur entre 0.5 et 9.4 mg/dL attendue";
+  }
                     return null;
                   },
                 ),
@@ -493,6 +510,10 @@ Future<void> savePredictionToFirestore(int prediction) async {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer le sodium sérique';
                     }
+                    final val = int.tryParse(value);
+  if (val == null || val < 113 || val > 148) {
+    return "Sodium entre 113 et 148 mEq/L requis";
+  }
                     return null;
                   },
                 ),
@@ -597,11 +618,7 @@ Future<void> savePredictionToFirestore(int prediction) async {
                   // Affichage de l'indicateur de chargement ou de la prédiction
                   if (isLoading)
                     CircularProgressIndicator(),
-                  if (!isLoading && predictionResult.isNotEmpty)
-                    Text(
-                      'Prédiction: $predictionResult',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+                 
                      ],
                 )),
             ),

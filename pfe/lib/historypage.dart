@@ -83,7 +83,7 @@ Diabète : ${predictionData['diabetes'] == 1 ? 'Oui' : 'Non'}
 Hypertension : ${predictionData['high_blood_pressure'] == 1 ? 'Oui' : 'Non'}
 Fumeur : ${predictionData['smoking'] == 1 ? 'Oui' : 'Non'}
 Créatinine phosphokinase : ${predictionData['creatinine_phosphokinase']}
-Fraction d’éjection : ${predictionData['ejection_fraction']}%
+Fraction d’éjection : ${predictionData['ejection_fraction']}
 Plaquettes : ${predictionData['platelets']}
 Créatinine sérique : ${predictionData['serum_creatinine']}
 Sodium sérique : ${predictionData['serum_sodium']}

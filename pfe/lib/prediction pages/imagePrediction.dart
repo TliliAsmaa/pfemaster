@@ -185,21 +185,34 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
   }
 
   void _showError(String message) {
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Erreur"),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
-              ),
-            ],
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: const [
+          Icon(Icons.error_outline, color: Colors.red),
+          SizedBox(width: 10),
+          Text(
+            "Erreur",
+            style: TextStyle(color: Colors.red),
           ),
-    );
-  }
+        ],
+      ),
+      content: Text(message, style: TextStyle(fontSize: 16)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            "OK",
+            style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -307,15 +320,7 @@ class _ImagePredictionPageState extends State<ImagePredictionPage> {
                           Image.file(_image!, height: 200),
                           /*-------------------------------------------*/
                           const SizedBox(height: 10),
-                          Text(
-                            "Âge détecté : $_age\nGenre détecté : $_gender",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
+                         
                           /*------------------------*/
                           // 👉 Tu ajoutes le bouton ici :
                           const SizedBox(height: 20),

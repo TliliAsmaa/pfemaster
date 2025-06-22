@@ -84,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   const SizedBox(height: 24),
                   _buildEditableRow("Nom complet", "full name", userData!['full name']),
-                  _buildEditableRow("Email", "email", userData!['email']),
+                 
                   _buildInfoRow("Âge", userData!['age'].toString()), // Non modifiable
                   _buildEditableRow("Genre", "gender", userData!['gender']),
                   _buildEditableRow("Date de naissance", "birth date", userData!['birth date']),

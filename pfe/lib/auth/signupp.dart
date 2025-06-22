@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:pfemaster/component/logoauth.dart';
 import 'package:pfemaster/component/textformfield.dart';
 
@@ -26,27 +26,15 @@ class _SignUpState extends State<SignUp> {
    GlobalKey<FormState> formkey = GlobalKey<FormState>();
   String? _selectedGender;
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-File? _imageFile;
+
 
  
 
   
   /// Méthode pour uploader la photo et récupérer son lien
-  Future<String?> _uploadImage(String uid) async {
-    try {
-      if (_imageFile == null) return null;
-
-      final storageRef = FirebaseStorage.instance.ref().child('user_photos/$uid.jpg');
-      await storageRef.putFile(_imageFile!);
-
-      return await storageRef.getDownloadURL();
-    } catch (e) {
-      print('Erreur lors de l\'upload de l\'image : $e');
-      return null;
-    }
-  }
+ 
  /// Méthode pour enregistrer les infos utilisateur
-  Future<void> addUser(String? photoUrl) async {
+  Future<void> addUser() async {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -56,7 +44,6 @@ File? _imageFile;
         'email': email.text,
         'birth date': _dateController.text,
         'gender': _selectedGender,
-        'photoUrl': photoUrl,
         'age': DateTime.now().year - DateTime.parse(_dateController.text).year,
         'created_at': DateTime.now(),
       });
@@ -68,20 +55,7 @@ File? _imageFile;
   }
 
 
-    
-/// Méthode pour choisir une image
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,7 +113,7 @@ File? _imageFile;
                           if (value == null || value.isEmpty) {
                             return "veuillez saisir votre adresse email";
                           }
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
                             return "veuillez saisir une adresse email valide";
                           }
                           return null;
@@ -160,9 +134,10 @@ File? _imageFile;
                           if (value == null || value.isEmpty) {
                             return "veuillez saisir votre mot de passe";
                           }
-                          if (value.length < 6) {
-                            return "Mot de passe trop court";
-                          }
+                           if (!RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$').hasMatch(value)) {
+    return "Mot de passe trop faible ";
+  }
+                          
                           return null;
                         },
                       ),
@@ -294,7 +269,7 @@ print("done");
                                    Navigator.of(context).push(MaterialPageRoute(
   builder: (_) => EmailVerificationScreen(
     uid: uid,
-    uploadImage: _uploadImage,
+   
     addUser: addUser,
   ),
 ));
@@ -409,13 +384,14 @@ print("done");
 
 class EmailVerificationScreen extends StatelessWidget {
   final String uid;
-  final Future<String?> Function(String uid) uploadImage;
-  final Future<void> Function(String? photoUrl) addUser;
+  
+  final Future<void> Function() addUser;
+
 
   const EmailVerificationScreen({
     super.key,
     required this.uid,
-    required this.uploadImage,
+    
     required this.addUser,
   });
 
@@ -442,8 +418,8 @@ class EmailVerificationScreen extends StatelessWidget {
                 await user?.reload();
 
                 if (user != null && user.emailVerified) {
-                  final photoUrl = await uploadImage(uid);
-                  await addUser(photoUrl);
+                 
+                  await addUser();
                   Navigator.of(context).pushReplacementNamed('Login');
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
