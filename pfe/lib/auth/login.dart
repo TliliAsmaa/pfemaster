@@ -182,6 +182,7 @@ Future signInWithGoogle() async {
   });
   await Future.delayed(Duration(milliseconds: 500)); 
   if(credential.user!.emailVerified){
+    
     Navigator.of(context).pushReplacementNamed('AuthWrapper');
     //ajouter un nouvel utilisateur dans la base de donnees
 

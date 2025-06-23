@@ -36,7 +36,7 @@ class _GooglesignupcompleteState extends State<Googlesignupcomplete> {
  
     //Navigator.of(context).pop();
       // Call the user's CollectionReference to add a new user
-      String? googlePhotoUrl = FirebaseAuth.instance.currentUser?.photoURL;
+      
 
       return users
            .doc(user.uid) // Utiliser l'UID de l'utilisateur pour le document
@@ -47,7 +47,7 @@ class _GooglesignupcompleteState extends State<Googlesignupcomplete> {
         'birth date': _dateController.text,
         'gender': _selectedGender,
         'age': age,
-        'photoUrl': googlePhotoUrl,
+       
         'createdAt': FieldValue.serverTimestamp(),
       })
           .then((value) {

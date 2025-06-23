@@ -157,7 +157,8 @@ Durée de suivi (jours) : ${predictionData['time']}
           return Center(child: CircularProgressIndicator());
 
         final predictions = snapshot.data!.docs;
-
+         if (predictions.isEmpty)
+          return Center(child: Text("Aucune prédiction trouvée"));
         return ListView.builder(
           padding: EdgeInsets.all(16),
           itemCount: predictions.length,

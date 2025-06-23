@@ -1,10 +1,11 @@
 import 'dart:async';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:pfemaster/auth/Emailveirifcationscreen.dart';
 
 import 'package:pfemaster/component/logoauth.dart';
 import 'package:pfemaster/component/textformfield.dart';
@@ -34,25 +35,32 @@ class _SignUpState extends State<SignUp> {
   /// Méthode pour uploader la photo et récupérer son lien
  
  /// Méthode pour enregistrer les infos utilisateur
-  Future<void> addUser() async {
-    try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
+  Future<void> addUser({
+  required String uid,
+  required String fullName,
+  required String email,
+  required String birthDate,
+  required String gender,
+}) async {
+  try {
+    final age = DateTime.now().year - DateTime.parse(birthDate).year;
 
-      await users.doc(uid).set({
-        'uid': uid,
-        'full name': username.text,
-        'email': email.text,
-        'birth date': _dateController.text,
-        'gender': _selectedGender,
-        'age': DateTime.now().year - DateTime.parse(_dateController.text).year,
-        'created_at': DateTime.now(),
-      });
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'uid': uid,
+      'full name': fullName,
+      'email': email,
+      'birth date': birthDate,
+      'gender': gender,
+      'age': age,
+      'created_at': DateTime.now(),
+    });
 
-      print("User ajouté avec succès !");
-    } catch (e) {
-      print("Erreur lors de l'ajout de l'utilisateur : $e");
-    }
+    print("User ajouté avec succès !");
+  } catch (e) {
+    print("Erreur lors de l'ajout de l'utilisateur : $e");
   }
+}
+
 
 
   
@@ -264,15 +272,39 @@ class _SignUpState extends State<SignUp> {
                                );
                                 final uid = FirebaseAuth.instance.currentUser!.uid;
 
-                              await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                            //  await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 print("done");
-                                   Navigator.of(context).push(MaterialPageRoute(
-  builder: (_) => EmailVerificationScreen(
-    uid: uid,
-   
-    addUser: addUser,
+                               
+                                  // Lancer la fonction pour ajouter l'utilisateur à Firestore
+                                final prefs = await SharedPreferences.getInstance();
+await prefs.setBool('awaitingEmailVerification', true);
+
+await prefs.setString('name', username.text);
+await prefs.setString('email', email.text);
+await prefs.setString('birthDate', _dateController.text);
+await prefs.setString('gender', _selectedGender!);
+
+                                Navigator.of(context).pushReplacement(
+  MaterialPageRoute(
+    builder: (context) => Emailverificationscreen(
+      uid: FirebaseAuth.instance.currentUser!.uid,
+      name: username.text,
+      email: email.text,
+      birthDate: _dateController.text,
+      gender: _selectedGender!,
+      addUser: () async {
+        await addUser(
+          uid: FirebaseAuth.instance.currentUser!.uid,
+           fullName: username.text,
+          email: email.text,
+          birthDate: _dateController.text,
+          gender: _selectedGender!,
+        );
+      },
+    ),
   ),
-));
+);
+
                                
                              /*await  FirebaseAuth.instance.currentUser!.sendEmailVerification();
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -382,55 +414,3 @@ print("done");
 
 
 
-class EmailVerificationScreen extends StatelessWidget {
-  final String uid;
-  
-  final Future<void> Function() addUser;
-
-
-  const EmailVerificationScreen({
-    super.key,
-    required this.uid,
-    
-    required this.addUser,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFF7FBFF),
-      appBar: AppBar(title: Text("Email de vérification")),
-      body: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "📧 Nous vous avons envoyé un email de vérification.\n\nVeuillez cliquer sur le lien dans votre boîte mail, puis appuyez sur le bouton ci-dessous.",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              child: Text("J’ai vérifié mon email"),
-              onPressed: () async {
-                User? user = FirebaseAuth.instance.currentUser;
-                await user?.reload();
-
-                if (user != null && user.emailVerified) {
-                 
-                  await addUser();
-                  Navigator.of(context).pushReplacementNamed('Login');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Email non encore vérifié")),
-                  );
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
