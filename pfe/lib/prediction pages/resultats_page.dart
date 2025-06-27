@@ -519,7 +519,9 @@ class _ResultatsPageState extends State<ResultatsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('${r.value}'),
+                        Text( r.identifiant == "Tension artérielle"
+                                ? r.value.toString()  // afficher le string tel quel
+                                : '${r.value}',),
                         Text(
                           r.min != null && r.max != null
                               ? '${r.min} - ${r.max}'

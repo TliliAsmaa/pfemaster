@@ -1,6 +1,6 @@
 class AnalyseResult {
   final String identifiant;
-  final double value;
+  final dynamic value;
   final String measurement;
   final String interpretation;
   final String reference;
@@ -24,7 +24,7 @@ class AnalyseResult {
   factory AnalyseResult.fromJson(Map<String, dynamic> json) {
     return AnalyseResult(
       identifiant: json['identifiant'] ?? '',
-      value: toDoubleSafe(json['value']),
+      value: json['value'],
       measurement: json['measurement'] ?? '',
       interpretation: json['interpretation'] ?? '',
       reference: json['reference'] ?? '',
