@@ -79,7 +79,8 @@ Ta mission :
    - son unité,
    - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL"),
    - une interprétation : 'bad', 'normal' ou 'illogical'.
-
+   - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
+   - Si la valeur est dans la plage de référence, l'interprétation est 'normal
 - Structure chaque test sur une ligne au format JSON suivant :
 {{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "reference": "plage_attendue", "interpretation": "bad"}}
 
@@ -139,6 +140,7 @@ Autres règles :
 Retourne un objet JSON strictement valide avec deux sections : "results" et "data". Ne mets aucun commentaire (pas de // ou /* ... */). Le JSON doit être parfaitement décodable sans aucune explication dans les valeurs. Toute explication doit être faite hors du JSON si nécessaire.
 
 1. **results** : Liste des tests avec leurs identifiants, valeurs, unités et interprétations sous forme d'objets JSON.
+  
 2. **data** : Un objet contenant les résultats agrégés pour remplir les colonnes du fichier CSV, y compris les champs comme `"anaemia"`, `"creatinine_phosphokinase"`, `"diabetes"`, `"platelets"`, etc., avec les valeurs interprétées.
 """
 
