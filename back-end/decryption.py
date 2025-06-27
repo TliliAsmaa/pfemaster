@@ -16,7 +16,7 @@ load_dotenv()
 
 # Configurer la clé API Gemini
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY")) # Remplace par ta vraie clé API
+genai.configure(api_key=os.getenv("GEMINI_API_KEY")) 
 
 model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
 

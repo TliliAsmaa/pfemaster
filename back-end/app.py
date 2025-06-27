@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 # Le chemin typique pour Ubuntu sur Render après installation via apt
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 CORS(app)
-# Charger ton modèle depuis un fichier .pkl
+
 model = joblib.load('modele_heart_failure.pkl')
-# Remplace par le chemin de ton modèle
+
 pca = joblib.load('pca_model.pkl')  # Modèle 
 
 modell=joblib.load('modele_heart_failure_p.pkl') # Modèle pour l'image
@@ -76,9 +76,9 @@ def prediction_img():
         logger.info(f"Requête reçue pour /prediction_img : {data}")
         # Extraction des 4 caractéristiques utilisées dans le modèle
         age = float(data['age'])
-        ejection_fraction = float(data['ejection_fraction'])
+        ejection_fraction = int(data['ejection_fraction'])
         serum_creatinine = float(data['serum_creatinine'])
-        time = float(data['time'])
+        time = int(data['time'])
         logger.info(f"Valeurs extraites : age={age}, ejection_fraction={ejection_fraction}, serum_creatinine={serum_creatinine}, time={time}")
         # Créer un tableau avec les 4 features dans le bon ordre
         input_data = np.array([[age, ejection_fraction, serum_creatinine, time]])

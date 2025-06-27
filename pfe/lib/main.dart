@@ -11,7 +11,7 @@ import 'package:pfemaster/auth/googlesignupcomplete.dart';
 import 'package:pfemaster/auth/login.dart';
 import 'package:pfemaster/auth/signupp.dart';
 import 'package:pfemaster/bottomnavbar.dart';
-import 'package:pfemaster/auth/signupp.dart';
+
 import 'package:pfemaster/homepage.dart';
 import 'package:pfemaster/modifieprofile.dart';
 
