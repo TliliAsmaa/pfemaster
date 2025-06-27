@@ -235,8 +235,13 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pushNamed(context, "formPrediction");
+                          onPressed: () async {
+                           final result = await Navigator.pushNamed(context, "formPrediction");
+
+  if (result == true) {
+    // Une nouvelle prédiction a été faite → on recharge les stats
+    fetchPredictionStats();
+  }
                           },
                           icon: Icon(Icons.analytics, color: Colors.white,size: 20),
                           label: Text(

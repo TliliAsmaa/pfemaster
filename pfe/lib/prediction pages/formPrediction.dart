@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:pfemaster/homepage.dart';
 import 'package:pfemaster/component/textformfield.dart';
 
 import 'dart:convert';
@@ -333,6 +333,8 @@ Future<void> savePredictionToFirestore(int prediction) async {
           'smoking': smoking,
           'time': int.parse(followUpTimeController.text),
         });
+       Navigator.pop(context, true);
+
     print("Prédiction sauvegardée avec succès");
   } catch (e) {
     print("Erreur lors de la sauvegarde : $e");
