@@ -133,7 +133,8 @@ Règles de remplissage :
 3. **Bilan Cardiaque** :
    - **creatinine_phosphokinase** : Si la CPK (créatine phosphokinase) est présente, utilise cette valeur pour le champ **creatinine_phosphokinase**.
 
-
+4. Si Glycémie à jeun est mentionné, vérifie si le glucose est supérieur à 1.26 g/L pour remplir le champ **diabetes**.
+5. Si Tension artérielle est mentionnée avec unité *mmHg*, vérifie si la pression artérielle est supérieure ou égale à 140/90 mmHg pour remplir le champ **high_blood_pressure**.
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
 
