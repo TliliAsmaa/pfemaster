@@ -80,7 +80,11 @@ Ta mission :
    - sa plage de référence médicale (même si la plage n’est pas dans le texte : utilise les plages par défaut)
    - une interprétation : 'bad', 'normal' ou 'illogical'.
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
-   - Si la valeur est dans la plage de référence, l'interprétation est 'normal
+   - Si la valeur est dans la plage de référence, l'interprétation est 'normal'
+4. La plage de référence doit absolument etre renseignée même si elle n'est pas dans le texte, utilise les plages par défaut suivantes :
+  - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
+  - Glycémie à jeun : "0.70 – 1.10 g/dL"
+  - Tension artérielle : "90/60 – 120/80 mmHg"
 - Structure chaque test sur une ligne au format JSON suivant :
 {{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "reference": "plage_attendue", "interpretation": "bad"}}
 
@@ -139,10 +143,7 @@ Règles de remplissage :
 
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
--si la plage de référence n'est pas mentionnée, utilise les plages par défaut suivantes :
-  - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
-  - Glycémie à jeun : "0.70 – 1.10 g/dL"
-  - Tension artérielle : "90/60 – 120/80 mmHg"
+
 Retourne un objet JSON strictement valide avec deux sections : "results" et "data". Ne mets aucun commentaire (pas de // ou /* ... */). Le JSON doit être parfaitement décodable sans aucune explication dans les valeurs. Toute explication doit être faite hors du JSON si nécessaire.
 
 1. **results** : Liste des tests avec leurs identifiants, valeurs, unités et interprétations sous forme d'objets JSON.
