@@ -81,7 +81,7 @@ Ta mission :
    - une interprétation : 'bad', 'normal' ou 'illogical'.
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal'
-4. La plage de référence doit absolument etre renseignée même si elle n'est pas dans le texte, utilise les plages par défaut suivantes :
+4. La plage de référence doit absolument etre renseignée même si elle n'est pas dans le texte, tu doit utiliser les plages par défaut suivantes :
   - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
   - Glycémie à jeun : "0.70 – 1.10 g/dL"
   - Tension artérielle : "90/60 – 120/80 mmHg"
