@@ -77,17 +77,15 @@ Ta mission :
    - son identifiant (nom du test),
    - sa valeur,
    - son unité,
-   - sa plage de référence médicale (même si la plage n’est pas dans le texte : utilise les plages par défaut)
+   - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL" pour femme, "13–17 g/dL" pour homme
+                                    exemple: pour Glycémie à jeun → "0.70 – 1.10 g/dL"
+                                    exemple: pour Tension artérielle → "90/60 – 120/80 mmHg"),
    - une interprétation : 'bad', 'normal' ou 'illogical'.
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal'
-4. La plage de référence doit absolument etre renseignée même si elle n'est pas dans le texte, tu doit utiliser les plages par défaut suivantes :
-  - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
-  - Glycémie à jeun : "0.70 – 1.10 g/dL"
-  - Tension artérielle : "90/60 – 120/80 mmHg"
+
 - Structure chaque test sur une ligne au format JSON suivant :
 {{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "reference": "plage_attendue", "interpretation": "bad"}}
--reference : "plage_attendue" doit etre renseignée même si elle n'est pas dans le texte
 
 4. Analyse uniquement les résultats pertinents pour remplir les colonnes suivantes (comme dans un fichier CSV médical) :
 
@@ -139,12 +137,6 @@ Règles de remplissage :
 
 4. Si Glycémie à jeun est mentionné, vérifie si le glucose est supérieur à 1.26 g/L pour remplir le champ **diabetes**.
 5. Si Tension artérielle est mentionnée avec unité *mmHg*, vérifie si la pression artérielle est supérieure ou égale à 140/90 mmHg pour remplir le champ **high_blood_pressure**.
-6.Pour les tests suivants, tu dois TOUJOURS inclure la plage de référence, même si elle n'apparaît pas dans le texte OCR :
-- Hémoglobine : si homme → "13 – 17 g/dL", si femme → "12 – 16 g/dL"
-- Glycémie à jeun : "0.70 – 1.10 g/dL"
-- Tension artérielle : "90/60 – 120/80 mmHg"
-Tu n’as pas le droit de laisser ces champs vides ou écrire "N/A".
-
 
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
