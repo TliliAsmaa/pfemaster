@@ -78,16 +78,8 @@ Ta mission :
    - sa valeur,
    - son unité,
    - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL"),
+   - si la plage de référence n'est pas fournie, utilise les plages de référence standards selon vos connaissances médicales.
    - une interprétation : 'bad', 'normal' ou 'illogical'.
-   - Utilise les **plages de référence suivantes si absentes dans le texte** :
-     - Hémoglobine : 13.5 – 17.5 g/dL (Homme), 12 – 16 g/dL (Femme)
-     - Glycémie à jeun : 0.70 – 1.10 g/L
-     - Tension artérielle : 90/60 – 120/80 mmHg (normale), bad si ≥140/90
-     - Créatinine Phosphokinase : 10 – 120 mcg/L (variable selon labo)
-     - Fraction d'éjection : 50% – 70%
-     - Plaquettes : 150000 – 450000 Kiloplatelets/mL
-     - Sérum créatinine : 0.6 – 1.2 mg/dL
-     - Sérum sodium : 135 – 145 mEq/L
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal
 - Structure chaque test sur une ligne au format JSON suivant :
