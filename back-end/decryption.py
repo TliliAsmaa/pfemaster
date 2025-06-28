@@ -139,7 +139,10 @@ Règles de remplissage :
 
 Autres règles :
 - **sex** = 1 si homme, sinon 0.
-
+-si la plage de référence n'est pas mentionnée, utilise les plages par défaut suivantes :
+  - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
+  - Glycémie à jeun : "0.70 – 1.10 g/dL"
+  - Tension artérielle : "90/60 – 120/80 mmHg"
 Retourne un objet JSON strictement valide avec deux sections : "results" et "data". Ne mets aucun commentaire (pas de // ou /* ... */). Le JSON doit être parfaitement décodable sans aucune explication dans les valeurs. Toute explication doit être faite hors du JSON si nécessaire.
 
 1. **results** : Liste des tests avec leurs identifiants, valeurs, unités et interprétations sous forme d'objets JSON.
