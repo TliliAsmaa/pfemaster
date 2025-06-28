@@ -77,15 +77,12 @@ Ta mission :
    - son identifiant (nom du test),
    - sa valeur,
    - son unité,
-   - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL"),
-   - si la plage de référence n'est pas fournie, utilise les plages de référence standards selon vos connaissances médicales.
-    - Hémoglobine :
-       - si sexe = 1 (homme) → "13 – 17 g/dL"
-       - si sexe = 0 (femme) → "12 – 16 g/dL"
-     - Glycémie à jeun : "0.70 – 1.10 g/dL"
-     - Tension artérielle : "90/60 – 120/80 mmHg"
-
+   - sa plage de référence médicale (même si la plage n’est pas dans le texte : utilise les plages par défaut)
    - une interprétation : 'bad', 'normal' ou 'illogical'.
+   - Plages par défaut à utiliser si non mentionnées :
+      - Hémoglobine : "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme)
+      - Glycémie à jeun : "0.70 – 1.10 g/dL"
+      - Tension artérielle : "90/60 – 120/80 mmHg"
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal
 - Structure chaque test sur une ligne au format JSON suivant :
