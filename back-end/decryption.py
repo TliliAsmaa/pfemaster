@@ -126,7 +126,7 @@ age : années (ans)
 Règles de remplissage :
 
 1. **Hématologie (NFS - Numération Formule Sanguine)** :
-   - Si l'hémoglobine est inférieure à 12 g/dL, alors **anaemia** = 1, sinon 0.
+   - Si l'hémoglobine est inférieure à 12 g/dL, alors **anaemia** = 1, sinon 0 ,et ajoute sa plage de référence "13 – 17 g/dL" (homme), "12 – 16 g/dL" (femme).
    - **platelets** : Si la numération plaquettaire est présente, utilise la valeur pour ce champ.
 
 2. **Biochimie Sanguine** :
@@ -137,8 +137,8 @@ Règles de remplissage :
 3. **Bilan Cardiaque** :
    - **creatinine_phosphokinase** : Si la CPK (créatine phosphokinase) est présente, utilise cette valeur pour le champ **creatinine_phosphokinase**.
 
-4. Si Glycémie à jeun est mentionné, vérifie si le glucose est supérieur à 1.26 g/L pour remplir le champ **diabetes**.
-5. Si Tension artérielle est mentionnée avec unité *mmHg*, vérifie si la pression artérielle est supérieure ou égale à 140/90 mmHg pour remplir le champ **high_blood_pressure**.
+4. Si Glycémie à jeun est mentionné, vérifie si le glucose est supérieur à 1.26 g/L pour remplir le champ **diabetes**, et ajoute sa plage de référence "0.70 – 1.10 g/dL".
+5. Si Tension artérielle est mentionnée avec unité *mmHg*, vérifie si la pression artérielle est supérieure ou égale à 140/90 mmHg pour remplir le champ **high_blood_pressure**,et ajoute sa plage de référence "90/60 – 120/80 mmHg".
 
 
 Autres règles :
