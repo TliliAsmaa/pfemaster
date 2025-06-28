@@ -87,7 +87,7 @@ Ta mission :
   - Tension artérielle : "90/60 – 120/80 mmHg"
 - Structure chaque test sur une ligne au format JSON suivant :
 {{"identifiant": "nom_du_test", "value": 45, "measurement": "ml", "reference": "plage_attendue", "interpretation": "bad"}}
-
+-reference : "plage_attendue" doit etre renseignée même si elle n'est pas dans le texte
 
 4. Analyse uniquement les résultats pertinents pour remplir les colonnes suivantes (comme dans un fichier CSV médical) :
 
