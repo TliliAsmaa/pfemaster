@@ -79,6 +79,11 @@ Ta mission :
    - son unité,
    - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL"),
    - si la plage de référence n'est pas fournie, utilise les plages de référence standards selon vos connaissances médicales.
+     - la plage de référence pour l'hémoglobine est de 12 à 16 g/dL pour les femmes et de 13 à 17 g/dL pour les hommes.
+     - la plage de référence pour le glycémie à jeun est de 0.7 à 1.0 g/dL.
+     - la plage de référence pour la tension artérielle est de 90/60 à 120/80 mmHg.
+
+
    - une interprétation : 'bad', 'normal' ou 'illogical'.
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal
