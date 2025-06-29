@@ -79,7 +79,8 @@ Ta mission :
    - son unité,
    - sa plage de référence médicale (exemple : pour Hémoglobine → "12–16 g/dL" pour femme, "13–17 g/dL" pour homme
                                     exemple: pour Glycémie à jeun → "0.70 – 1.10 g/dL"
-                                    exemple: pour Tension artérielle → "90/60 – 120/80 mmHg"),
+                                    exemple: pour Tension artérielle → "90/60 – 120/80 mmHg"
+                                    exemple: pour créatinine phosphokinase → "87 – 561 mcg/L" pour homme, "63 – 295 mcg/L" pour femme),
    - une interprétation : 'bad', 'normal' ou 'illogical'.
    - Si la valeur est en dehors de la plage de référence, l'interprétation est 'bad'.
    - Si la valeur est dans la plage de référence, l'interprétation est 'normal'

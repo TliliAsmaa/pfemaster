@@ -522,11 +522,12 @@ class _ResultatsPageState extends State<ResultatsPage> {
                         Text( r.identifiant == "Tension artérielle"
                                 ? r.value.toString()  // afficher le string tel quel
                                 : '${r.value}',),
-                        Text(
-                          r.min != null && r.max != null
-                              ? '${r.min} - ${r.max}'
-                              : 'N/A',
-                        ),
+                       Text(
+  r.reference != null && r.reference!.trim().isNotEmpty
+      ? r.reference!
+      : 'N/A',
+),
+
                         Text(r.measurement),
                       ],
                     ),

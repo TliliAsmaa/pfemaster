@@ -3,7 +3,7 @@ class AnalyseResult {
   final dynamic value;
   final String measurement;
   final String interpretation;
-  final String reference;
+  final String? reference;
 
   AnalyseResult({
     required this.identifiant,
@@ -37,7 +37,7 @@ class AnalyseResult {
       r'(\d+\.?\d*)\s*[-à]\s*(\d+\.?\d*)',
       caseSensitive: false,
     );
-    final match = regex.firstMatch(reference);
+    final match = regex.firstMatch(reference!);
     if (match != null) {
       return double.tryParse(match.group(1)!);
     }
@@ -50,7 +50,7 @@ class AnalyseResult {
       r'(\d+\.?\d*)\s*[-à]\s*(\d+\.?\d*)',
       caseSensitive: false,
     );
-    final match = regex.firstMatch(reference);
+    final match = regex.firstMatch(reference!);
     if (match != null) {
       return double.tryParse(match.group(2)!);
     }

@@ -7,17 +7,12 @@
     <list default="true" id="7baef88a-f9a6-4264-b314-57574e199e06" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/.metadata" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/.metadata" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/arm64-v8a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/arm64-v8a/configure_fingerprint.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/armeabi-v7a/configure_fingerprint.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86/configure_fingerprint.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/android/app/.cxx/Debug/5yb244y1/x86_64/configure_fingerprint.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/auth/signupp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/auth/signupp.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/historypage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/historypage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/formPrediction.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/formPrediction.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/imagePrediction.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/analyse_resultat.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/analyse_resultat.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pfe/lib/prediction pages/resultats_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/prediction pages/resultats_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfe/lib/profilepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pfe/lib/profilepage.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
