@@ -150,6 +150,13 @@ def analyse():
     except Exception as e:
         logger.error("Erreur générale : " + str(e))
         return jsonify({'error': 'Erreur interne', 'details': str(e)}), 500
+
+
+@app.route("/test", methods=["POST"])
+def test_route():
+    print("✅ Requête POST reçue !")
+    return jsonify({"status": "OK"}), 200
+
 """
 @app.route('/analyse', methods=['POST'])
 def analyse():
